@@ -1,4 +1,15 @@
-export type Platform = 'leetcode';
+export type Platform = 'leetcode' | 'gfg';
+
+export type EnabledPlatformKey = Platform | 'hackerrank' | 'codeforces' | 'atcoder' | 'codechef';
+
+export interface EnabledPlatforms {
+  leetcode: boolean;
+  gfg: boolean;
+  hackerrank: boolean;
+  codeforces: boolean;
+  atcoder: boolean;
+  codechef: boolean;
+}
 
 export interface SyncSettings {
   repository: string;
@@ -7,6 +18,7 @@ export interface SyncSettings {
   commitTemplate: string;
   notifications: boolean;
   overwriteBehavior: 'skip' | 'overwrite' | 'versioned';
+  enabledPlatforms: EnabledPlatforms;
   autoMetadata?: boolean;
   autoReadme?: boolean;
   retryFailedSync?: boolean;
@@ -16,19 +28,19 @@ export interface SyncSettings {
 
 export interface SubmissionPayload {
   platform: Platform;
-  problemId: string;
-  problemNumber?: string;
-  problemSlug?: string;
   title: string;
-  difficulty: string;
+  slug: string;
   language: string;
   code: string;
+  difficulty?: string;
+  url: string;
+  tags?: string[];
+  submittedAt?: string;
+  source?: string;
+  problemId?: string;
+  problemNumber?: string;
   runtime?: string;
   memory?: string;
-  tags: string[];
-  url: string;
-  submittedAt: string;
-  source: string;
 }
 
 export interface GitHubProfile {
@@ -73,4 +85,12 @@ export interface SyncDebugState {
   title?: string;
   language?: string;
   message?: string;
+}
+
+export interface SyncStats {
+  totalSynced: number;
+  leetcodeSynced: number;
+  gfgSynced: number;
+  repositoriesConnected: string[];
+  lastSync?: string;
 }

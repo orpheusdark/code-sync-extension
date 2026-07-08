@@ -1,5 +1,6 @@
 {
   "manifest_version": 3,
+  "key": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA0XjwX1VMcCApIWJo4Sk/8h1VW4eaLOdHcxrld+1XC34F4RFAknDT0UNR+RIbfzjfACFF2suKizibRdtqkiKHXuIFlUbgK8FWH/T6MrX6Fh8Nr3daOtQqgXRdEO++KXR9/cBJqTo86a3Zs5RDCAtU3Gb8dZYb+RoOdHBesF6UvE7dfqFZlPLpkcxUth9pwiIoQj3naYQF0RyovuOwyVE1kVrzW3CVzFL7wxTN+OIcYGkcs5/t1mxohuVw8hyje5xSgeQRAOF9RkU2E51rYshZ8qOsUlrkByVripWzHIp7ncufotrMiiXBrJadkIR0PVqhC62DtHRcFnvLbhycdmFN6QIDAQAB",
   "name": "CodeSync Extension",
   "version": "1.0.0",
   "description": "Automatically sync accepted coding platform solutions to GitHub.",
@@ -7,6 +8,8 @@
   "host_permissions": [
     "https://leetcode.com/*",
     "https://*.leetcode.com/*",
+    "https://practice.geeksforgeeks.org/*",
+    "https://www.geeksforgeeks.org/*",
     "https://github.com/*",
     "https://code-sync-extension-backend.onrender.com/*"
   ],
@@ -16,15 +19,47 @@
   },
   "content_scripts": [
     {
-      "matches": ["https://leetcode.com/*", "https://*.leetcode.com/*"],
+      "matches": [
+        "https://leetcode.com/*",
+        "https://*.leetcode.com/*",
+        "https://practice.geeksforgeeks.org/*",
+        "https://www.geeksforgeeks.org/*"
+      ],
       "js": ["content/index.js"],
-      "type": "module",
       "run_at": "document_idle"
     }
   ],
   "action": {
     "default_title": "CodeSync",
-    "default_popup": "popup.html"
+    "default_popup": "popup.html",
+    "default_icon": {
+      "16": "icons/icon16.png",
+      "32": "icons/icon32.png",
+      "48": "icons/icon48.png"
+    }
   },
-  "options_page": "options.html"
+  "icons": {
+    "16": "icons/icon16.png",
+    "32": "icons/icon32.png",
+    "48": "icons/icon48.png",
+    "128": "icons/icon128.png"
+  },
+  "options_page": "options.html",
+  "web_accessible_resources": [
+    {
+      "resources": [
+        "icons/platforms/*.svg",
+        "icons/icon16.png",
+        "icons/icon32.png",
+        "icons/icon48.png",
+        "icons/icon128.png"
+      ],
+      "matches": [
+        "https://leetcode.com/*",
+        "https://*.leetcode.com/*",
+        "https://practice.geeksforgeeks.org/*",
+        "https://www.geeksforgeeks.org/*"
+      ]
+    }
+  ]
 }
