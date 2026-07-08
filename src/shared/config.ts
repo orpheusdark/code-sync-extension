@@ -4,7 +4,7 @@ const extensionId = typeof chrome !== 'undefined' && chrome.runtime?.id
 
 const apiBaseUrl = typeof globalThis !== 'undefined' && (globalThis as { __CODESYNC_API_BASE_URL__?: string }).__CODESYNC_API_BASE_URL__
   ? (globalThis as { __CODESYNC_API_BASE_URL__?: string }).__CODESYNC_API_BASE_URL__
-  : 'http://localhost:3000';
+  : 'https://code-sync-extension-backend.onrender.com';
 
 export const CONFIG = {
   API_BASE_URL: apiBaseUrl,
