@@ -1,0 +1,30 @@
+{
+  "manifest_version": 3,
+  "name": "CodeSync Extension",
+  "version": "1.0.0",
+  "description": "Automatically sync accepted coding platform solutions to GitHub.",
+  "permissions": ["storage", "tabs", "activeTab", "identity"],
+  "host_permissions": [
+    "https://leetcode.com/*",
+    "https://*.leetcode.com/*",
+    "https://github.com/*",
+    "http://localhost:3000/*"
+  ],
+  "background": {
+    "service_worker": "background/index.js",
+    "type": "module"
+  },
+  "content_scripts": [
+    {
+      "matches": ["https://leetcode.com/*", "https://*.leetcode.com/*"],
+      "js": ["content/index.js"],
+      "type": "module",
+      "run_at": "document_idle"
+    }
+  ],
+  "action": {
+    "default_title": "CodeSync",
+    "default_popup": "popup.html"
+  },
+  "options_page": "options.html"
+}
