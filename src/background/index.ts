@@ -1,14 +1,38 @@
 import { MESSAGE_TYPES } from '../shared/messages';
 import { loadState, saveState } from '../shared/storage';
 import { DEFAULT_SETTINGS, STORAGE_KEYS } from '../shared/constants';
-import type { GitHubAuthState, SubmissionPayload, SyncDebugState, SyncSettings } from '../shared/types';
+import type { GitHubAuthState, SubmissionPayload, SyncDebugState, SyncSettings, SyncStats } from '../shared/types';
 import { syncSubmissionToGitHub } from './services/sync';
 import { showNotification } from './services/notifications';
-import { authenticateWithGitHub } from './github/oauth';
+import { authenticateWithGitHub, cancelDeviceAuthorization } from './github/oauth';
 import { clearGitHubAuth, getGitHubBranches, getGitHubProfile, getGitHubRepositories } from './github/api';
 
 async function saveSyncDebugState(nextState: SyncDebugState): Promise<void> {
   await saveState(STORAGE_KEYS.SYNC_DEBUG, nextState);
+}
+
+async function updateSyncStats(submission: SubmissionPayload): Promise<void> {
+  const currentStats = await loadState<SyncStats>(STORAGE_KEYS.SYNC_STATS, {
+    totalSynced: 0,
+    leetcodeSynced: 0,
+    gfgSynced: 0,
+    repositoriesConnected: []
+  });
+
+  const repository = (await loadState<SyncSettings>(STORAGE_KEYS.SETTINGS, DEFAULT_SETTINGS)).repository;
+  const repositoriesConnected = repository && !currentStats.repositoriesConnected.includes(repository)
+    ? currentStats.repositoriesConnected
+    : repository
+      ? [...currentStats.repositoriesConnected, repository]
+      : currentStats.repositoriesConnected;
+
+  await saveState(STORAGE_KEYS.SYNC_STATS, {
+    totalSynced: currentStats.totalSynced + 1,
+    leetcodeSynced: currentStats.leetcodeSynced + (submission.platform === 'leetcode' ? 1 : 0),
+    gfgSynced: currentStats.gfgSynced + (submission.platform === 'gfg' ? 1 : 0),
+    repositoriesConnected,
+    lastSync: new Date().toISOString()
+  });
 }
 
 chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
@@ -61,6 +85,8 @@ chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
 
         const result = await syncSubmissionToGitHub(submission, settings);
         await saveState(STORAGE_KEYS.LAST_SYNC, Date.now());
+        await saveState(STORAGE_KEYS.LAST_SYNCED_SUBMISSION, submission);
+        await updateSyncStats(submission);
         await saveSyncDebugState({
           status: 'success',
           updatedAt: new Date().toISOString(),
@@ -72,7 +98,7 @@ chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
           language: submission.language,
           message: result.message
         });
-        await showNotification(result.message);
+        await showNotification(`✓ ${submission.title} synced successfully.`);
         sendResponse({ ok: true, result });
       } catch (error) {
         const messageText = error instanceof Error ? error.message : 'Unknown error';
@@ -87,7 +113,7 @@ chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
           language: submission.language,
           message: messageText
         });
-        await showNotification(`Sync failed: ${messageText}`);
+        await showNotification('Unable to sync.\nRetry');
         sendResponse({ ok: false, reason: messageText });
       }
       return;
@@ -100,6 +126,7 @@ chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
     }
 
     if (message.type === MESSAGE_TYPES.LOGOUT) {
+      cancelDeviceAuthorization();
       await clearGitHubAuth();
       sendResponse({ ok: true });
       return;
