@@ -1,86 +1,93 @@
-# CodeSync Extension
+<div align="center">
 
-CodeSync is a Chrome extension that syncs accepted coding-platform submissions into GitHub.
+# <img width="50" height="50" alt="CodeCodingGIFbyEscuelaDevRock" src="https://github.com/user-attachments/assets/7f557b18-2f29-4008-a32c-2a6f0abe81c3" /> CodeSync
+ 
 
-## Architecture
+### Automatically sync your accepted coding solutions from **LeetCode** and **GeeksforGeeks** directly to your GitHub repository with a single click.
 
-- Extension: browser-side UI, OAuth initiation, and sync logic
-- Backend: local Express server that exchanges GitHub OAuth codes for access tokens
+<p align="center">
 
-## Local development
 
-1. Install extension dependencies:
-   ```bash
-   npm install
-   ```
-2. Install backend dependencies:
-   ```bash
-   cd backend && npm install
-   ```
-3. Configure GitHub OAuth in the backend environment:
-   ```bash
-   cd backend
-   cp .env .env.local
-   ```
-   Fill in:
-   - `GITHUB_CLIENT_ID`
-   - `GITHUB_CLIENT_SECRET`
-   - `PORT=3000`
-4. Start the backend:
-   ```bash
-   cd backend && npm run dev
-   ```
-5. Build the extension:
-   ```bash
-   npm run build
-   ```
-6. Load the unpacked extension from the `dist` folder in Chrome.
+<img src="assets/banner.png" alt="CodeSync Banner" width="100%">
 
-## OAuth setup
+</p>
 
-CodeSync uses GitHub's **Device Authorization Flow** by default. This avoids redirect URI
-registration entirely and works on every machine.
+---
 
-Steps:
+### 🚀 One Click • Secure OAuth • Automatic GitHub Commits
 
-1. Create a [GitHub OAuth App](https://github.com/settings/developers).
-2. Enable **Device Flow** on the OAuth app (Developer settings → OAuth Apps → your app).
-3. Set `GITHUB_CLIENT_ID` and `GITHUB_CLIENT_SECRET` on the backend (Render env vars or `backend/.env`).
-4. Copy the client ID into `src/shared/config.ts` (`GITHUB_CLIENT_ID`) if it differs.
+</div>
 
-Sign-in flow:
+---
 
-1. Click **Continue with GitHub** in the popup.
-2. A device code appears and `github.com/login/device` opens in a new tab.
-3. Enter the code on GitHub and approve access.
-4. The extension connects automatically once approval completes.
+CodeSync is a browser extension that eliminates the repetitive process of manually copying coding solutions into GitHub.
 
-### Optional: browser redirect flow
+No manual copying.
 
-If you prefer the one-click GitHub popup instead of device codes:
+No downloading files.
 
-1. Set **Authorization callback URL** on the OAuth app to:
+No Git commands.
 
-   ```text
-   https://plnopbamiedbgmoopcngjnjflkeagebd.chromiumapp.org/
-   ```
+Just solve → sync.
 
-2. Set `USE_WEB_OAUTH_FLOW: true` in `src/shared/config.ts` and rebuild.
 
-The backend only exchanges tokens; it is never used as the OAuth redirect target.
+---
 
-## Production migration
+## 🎯 Supported Platforms
 
-To move from local development to production, change only the backend configuration value:
+| Platform | Status |
+|----------|--------|
+| ✅ LeetCode | Supported |
+| ✅ GeeksforGeeks | Supported |
+| 🚧 HackerRank | Coming Soon |
+| 🚧 Codeforces | Planned |
+| 🚧 AtCoder | Planned |
+| 🚧 CodeChef | Planned |
 
-```ts
-API_BASE_URL: "http://localhost:3000";
-```
+---
 
-Update it to your hosted backend URL such as:
 
-```ts
-API_BASE_URL: "https://api.codesync.dev";
-```
 
-The extension logic remains the same.
+# 🚀 Installation
+
+## Microsoft Edge
+
+Install directly from the Microsoft Edge Add-ons Store.
+
+> *(Store Link after approval)*
+
+---
+
+
+# 🐛 Reporting Issues
+
+Found a bug?
+
+Please open an issue with:
+
+- Browser
+- Extension Version
+- Platform
+- Steps to Reproduce
+- Screenshots (if applicable)
+
+
+---
+
+# ⭐ Support
+
+If you find CodeSync useful,
+
+consider giving the repository a ⭐.
+
+It helps more developers discover the project.
+
+---
+
+<div align="center">
+
+## Built for Competitive Programmers ❤️
+
+**Solve Problems. Click Sync. Build Your GitHub Automatically.**
+
+</div>
