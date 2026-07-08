@@ -1,0 +1,200 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Privacy Policy for CodeSync</title>
+    <style>
+      :root {
+        color-scheme: light;
+        --bg: #f8fafc;
+        --card: #ffffff;
+        --text: #0f172a;
+        --muted: #475569;
+        --border: #e2e8f0;
+        --accent: #1d4ed8;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        background: linear-gradient(180deg, #f1f5f9 0%, #f8fafc 45%, #ffffff 100%);
+        color: var(--text);
+        line-height: 1.65;
+      }
+
+      .container {
+        width: min(920px, 92vw);
+        margin: 48px auto;
+      }
+
+      .card {
+        background: var(--card);
+        border: 1px solid var(--border);
+        border-radius: 16px;
+        padding: 28px;
+        box-shadow: 0 14px 38px rgba(2, 6, 23, 0.07);
+      }
+
+      h1 {
+        margin: 0 0 8px;
+        font-size: clamp(1.6rem, 1.2rem + 1.5vw, 2.1rem);
+      }
+
+      h2 {
+        margin-top: 28px;
+        margin-bottom: 10px;
+        font-size: 1.16rem;
+      }
+
+      p,
+      li {
+        color: var(--muted);
+      }
+
+      .updated {
+        color: #334155;
+        font-weight: 600;
+      }
+
+      hr {
+        border: 0;
+        border-top: 1px solid var(--border);
+        margin: 22px 0;
+      }
+
+      ul {
+        padding-left: 20px;
+      }
+
+      a {
+        color: var(--accent);
+      }
+
+      footer {
+        margin-top: 24px;
+        color: #64748b;
+        font-size: 0.92rem;
+      }
+    </style>
+  </head>
+  <body>
+    <main class="container">
+      <article class="card">
+        <h1>Privacy Policy for CodeSync</h1>
+        <p class="updated"><strong>Last Updated:</strong> July 8, 2026</p>
+
+        <h2>Introduction</h2>
+        <p>
+          CodeSync is a browser extension that helps users synchronize accepted LeetCode solutions directly to their own GitHub repositories.
+        </p>
+        <p>
+          Your privacy is important. This Privacy Policy explains what information CodeSync processes, how it is used, and how it is protected.
+        </p>
+
+        <hr />
+
+        <h2>Information We Process</h2>
+        <p>CodeSync may process the following information:</p>
+        <ul>
+          <li>GitHub OAuth authentication information.</li>
+          <li>GitHub username and profile information required for authentication.</li>
+          <li>The source code of accepted LeetCode submissions.</li>
+          <li>Problem details such as title, problem number, programming language, and URL.</li>
+          <li>User preferences including the selected GitHub repository, branch, and extension settings.</li>
+        </ul>
+        <p>CodeSync does <strong>not</strong> collect passwords or GitHub credentials.</p>
+
+        <hr />
+
+        <h2>How Your Information Is Used</h2>
+        <p>The information is used only to:</p>
+        <ul>
+          <li>Authenticate you with GitHub.</li>
+          <li>Synchronize accepted LeetCode solutions to the GitHub repository you select.</li>
+          <li>Remember your extension settings and preferences.</li>
+          <li>Improve the reliability of the synchronization process.</li>
+        </ul>
+
+        <hr />
+
+        <h2>Data Storage</h2>
+        <p>
+          CodeSync stores user preferences and authentication data locally using the browser's storage APIs.
+        </p>
+        <p>
+          If a backend service is used for GitHub OAuth authentication, it is used only to complete the authentication process and is <strong>not</strong> used to collect or sell user information.
+        </p>
+
+        <hr />
+
+        <h2>Data Sharing</h2>
+        <p>CodeSync does <strong>not</strong> sell, rent, or share your personal information with advertisers or third parties.</p>
+        <p>Information is shared only with:</p>
+        <ul>
+          <li><strong>GitHub</strong>, to authenticate your account and create commits in your selected repository.</li>
+          <li><strong>The CodeSync authentication backend</strong>, when required to complete the GitHub OAuth authentication flow.</li>
+        </ul>
+        <p>No information is shared for advertising or analytics purposes.</p>
+
+        <hr />
+
+        <h2>Data Security</h2>
+        <p>CodeSync uses secure HTTPS connections for communication with GitHub and any authentication backend.</p>
+        <p>GitHub passwords are never requested, stored, or transmitted by the extension.</p>
+        <p>Reasonable measures are taken to protect authentication tokens and user preferences.</p>
+
+        <hr />
+
+        <h2>User Control</h2>
+        <p>You may:</p>
+        <ul>
+          <li>Log out of GitHub from the extension.</li>
+          <li>Change the selected repository or branch at any time.</li>
+          <li>Remove stored extension data by clearing the browser's extension storage.</li>
+          <li>Uninstall the extension to remove locally stored data.</li>
+        </ul>
+
+        <hr />
+
+        <h2>Third-Party Services</h2>
+        <p>CodeSync interacts only with services required for its functionality, including:</p>
+        <ul>
+          <li>GitHub OAuth</li>
+          <li>GitHub REST API</li>
+        </ul>
+        <p>These services are governed by their own privacy policies.</p>
+
+        <hr />
+
+        <h2>Children's Privacy</h2>
+        <p>
+          CodeSync is not intended for children under the age of 13 and does not knowingly collect personal information from children.
+        </p>
+
+        <hr />
+
+        <h2>Changes to This Privacy Policy</h2>
+        <p>
+          This Privacy Policy may be updated from time to time to reflect improvements or changes to the extension.
+        </p>
+        <p>The latest version will always be available in the project's repository.</p>
+
+        <hr />
+
+        <h2>Contact</h2>
+        <p>
+          If you have any questions or concerns regarding this Privacy Policy, please open an issue in the project's GitHub repository or contact the developer through the project's support page.
+        </p>
+
+        <footer>
+          CodeSync Privacy Policy
+        </footer>
+      </article>
+    </main>
+  </body>
+</html>
