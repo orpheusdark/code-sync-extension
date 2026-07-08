@@ -1,7 +1,9 @@
 # Privacy Policy for CodeSync
+
 **Last Updated:** July 8, 2026
 
 ## Introduction
+
 CodeSync is a browser extension that helps users synchronize accepted LeetCode solutions directly to their own GitHub repositories.
 
 Your privacy is important. This Privacy Policy explains what information CodeSync processes, how it is used, and how it is protected.
@@ -9,6 +11,7 @@ Your privacy is important. This Privacy Policy explains what information CodeSyn
 ---
 
 ## Information We Process
+
 CodeSync may process the following information:
 
 - GitHub OAuth authentication information.
@@ -22,6 +25,7 @@ CodeSync does **not** collect passwords or GitHub credentials.
 ---
 
 ## How Your Information Is Used
+
 The information is used only to:
 
 - Authenticate you with GitHub.
@@ -32,6 +36,7 @@ The information is used only to:
 ---
 
 ## Data Storage
+
 CodeSync stores user preferences and authentication data locally using the browser's storage APIs.
 
 If a backend service is used for GitHub OAuth authentication, it is used only to complete the authentication process and is **not** used to collect or sell user information.
@@ -39,6 +44,7 @@ If a backend service is used for GitHub OAuth authentication, it is used only to
 ---
 
 ## Data Sharing
+
 CodeSync does **not** sell, rent, or share your personal information with advertisers or third parties.
 
 Information is shared only with:
@@ -51,6 +57,7 @@ No information is shared for advertising or analytics purposes.
 ---
 
 ## Data Security
+
 CodeSync uses secure HTTPS connections for communication with GitHub and any authentication backend.
 
 GitHub passwords are never requested, stored, or transmitted by the extension.
@@ -60,6 +67,7 @@ Reasonable measures are taken to protect authentication tokens and user preferen
 ---
 
 ## User Control
+
 You may:
 
 - Log out of GitHub from the extension.
@@ -70,6 +78,7 @@ You may:
 ---
 
 ## Third-Party Services
+
 CodeSync interacts only with services required for its functionality, including:
 
 - GitHub OAuth
@@ -80,11 +89,13 @@ These services are governed by their own privacy policies.
 ---
 
 ## Children's Privacy
+
 CodeSync is not intended for children under the age of 13 and does not knowingly collect personal information from children.
 
 ---
 
 ## Changes to This Privacy Policy
+
 This Privacy Policy may be updated from time to time to reflect improvements or changes to the extension.
 
 The latest version will always be available in the project's repository.
@@ -92,4 +103,5 @@ The latest version will always be available in the project's repository.
 ---
 
 ## Contact
+
 If you have any questions or concerns regarding this Privacy Policy, please open an issue in the project's GitHub repository or contact the developer through the project's support page.
