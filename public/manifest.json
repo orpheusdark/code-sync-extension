@@ -8,7 +8,7 @@
     "https://leetcode.com/*",
     "https://*.leetcode.com/*",
     "https://github.com/*",
-    "http://localhost:3000/*"
+    "https://code-sync-extension-backend.onrender.com/*"
   ],
   "background": {
     "service_worker": "background/index.js",

@@ -39,7 +39,7 @@ export async function authenticateWithGitHub(): Promise<{ ok: boolean; message: 
         body: JSON.stringify({ code, redirectUri })
       });
     } catch {
-      throw new Error('Unable to reach the local auth backend. Make sure the backend is running.');
+      throw new Error('Unable to reach the auth backend. Make sure the backend is available.');
     }
 
     if (!tokenResponse.ok) {
