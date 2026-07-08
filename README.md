@@ -38,13 +38,36 @@ CodeSync is a Chrome extension that syncs accepted coding-platform submissions i
 
 ## OAuth setup
 
-Create a GitHub OAuth app and set the callback URL to:
+CodeSync uses GitHub's **Device Authorization Flow** by default. This avoids redirect URI
+registration entirely and works on every machine.
 
-```text
-http://localhost:3000/auth/github/callback
-```
+Steps:
 
-For local testing, use the backend as the token exchange layer. The extension never handles the client secret.
+1. Create a [GitHub OAuth App](https://github.com/settings/developers).
+2. Enable **Device Flow** on the OAuth app (Developer settings → OAuth Apps → your app).
+3. Set `GITHUB_CLIENT_ID` and `GITHUB_CLIENT_SECRET` on the backend (Render env vars or `backend/.env`).
+4. Copy the client ID into `src/shared/config.ts` (`GITHUB_CLIENT_ID`) if it differs.
+
+Sign-in flow:
+
+1. Click **Continue with GitHub** in the popup.
+2. A device code appears and `github.com/login/device` opens in a new tab.
+3. Enter the code on GitHub and approve access.
+4. The extension connects automatically once approval completes.
+
+### Optional: browser redirect flow
+
+If you prefer the one-click GitHub popup instead of device codes:
+
+1. Set **Authorization callback URL** on the OAuth app to:
+
+   ```text
+   https://plnopbamiedbgmoopcngjnjflkeagebd.chromiumapp.org/
+   ```
+
+2. Set `USE_WEB_OAUTH_FLOW: true` in `src/shared/config.ts` and rebuild.
+
+The backend only exchanges tokens; it is never used as the OAuth redirect target.
 
 ## Production migration
 
