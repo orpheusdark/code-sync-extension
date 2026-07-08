@@ -22,11 +22,12 @@ export async function syncSubmissionToGitHub(payload: SubmissionPayload, setting
   }
 
   const branch = settings.branch || 'main';
-  const problemNumber = normalizeProblemNumber(payload.problemNumber || payload.problemId);
+  const problemNumber = normalizeProblemNumber(payload.problemNumber || payload.problemId || payload.slug);
   const title = normalizeProblemTitle(payload.title);
   const extension = resolveLanguageExtension(payload.language, payload.code);
-  const fileName = `${problemNumber}. ${title}.${extension}`;
-  const filePath = `LeetCode/${fileName}`;
+  const platformFolder = resolvePlatformFolder(payload.platform);
+  const fileName = payload.platform === 'gfg' ? `${title}.${extension}` : `${problemNumber}. ${title}.${extension}`;
+  const filePath = `${platformFolder}/${fileName}`;
   const existingFile = await getGitHubFile(repo, branch, auth.token, filePath);
 
   if (existingFile && existingFile.content === payload.code) {
@@ -39,7 +40,8 @@ export async function syncSubmissionToGitHub(payload: SubmissionPayload, setting
     };
   }
 
-  await putGitHubFile(repo, branch, auth.token, filePath, payload.code, existingFile?.sha, fileName);
+  const commitMessage = buildCommitMessage(payload.platform, title, Boolean(existingFile));
+  await putGitHubFile(repo, branch, auth.token, filePath, payload.code, existingFile?.sha, commitMessage);
 
   return {
     ok: true,
@@ -71,12 +73,12 @@ async function getGitHubFile(repo: string, branch: string, token: string, path: 
   };
 }
 
-async function putGitHubFile(repo: string, branch: string, token: string, path: string, content: string, sha: string | undefined, fileName: string): Promise<void> {
+async function putGitHubFile(repo: string, branch: string, token: string, path: string, content: string, sha: string | undefined, commitMessage: string): Promise<void> {
   const response = await fetch(githubContentsUrl(repo, path), {
     method: 'PUT',
     headers: githubHeaders(token),
     body: JSON.stringify({
-      message: `Solved ${fileName}`,
+      message: commitMessage,
       content: encodeBase64Content(content),
       branch,
       ...(sha ? { sha } : {})
@@ -113,6 +115,18 @@ function decodeBase64Content(content: string): string {
 function normalizeProblemNumber(value: string): string {
   const digits = value.match(/\d+/)?.[0] ?? value;
   return digits.padStart(4, '0');
+}
+
+function resolvePlatformFolder(platform: SubmissionPayload['platform']): string {
+  return platform === 'gfg' ? 'GeeksForGeeks' : 'LeetCode';
+}
+
+function buildCommitMessage(platform: SubmissionPayload['platform'], title: string, isUpdate: boolean): string {
+  if (platform === 'gfg') {
+    return `${isUpdate ? 'Update' : 'Add'} GFG solution: ${title}`;
+  }
+
+  return `Solved ${title}`;
 }
 
 function normalizeProblemTitle(value: string): string {
