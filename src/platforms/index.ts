@@ -1,12 +1,11 @@
-import { isLeetCodePage } from './leetcode/detector';
-import { extractLeetCodeSubmission, extractLeetCodeSubmissionWithFallback } from './leetcode/extractor';
+import { detectActivePlatform } from './registry';
 
-export function detectAndExtractSubmission(): ReturnType<typeof extractLeetCodeSubmission> {
-  if (!isLeetCodePage()) return null;
-  return extractLeetCodeSubmission();
+export function detectAndExtractSubmission() {
+  const adapter = detectActivePlatform();
+  return adapter ? adapter.extractSubmission() : null;
 }
 
 export async function detectAndExtractSubmissionAsync() {
-  if (!isLeetCodePage()) return null;
-  return extractLeetCodeSubmissionWithFallback();
+  const adapter = detectActivePlatform();
+  return adapter ? adapter.extractSubmission() : null;
 }
