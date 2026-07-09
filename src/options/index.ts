@@ -341,7 +341,7 @@ function buildSharePanel(): string {
 }
 
 function buildAboutPanel(): string {
-  const version = '1.0.0';
+  const version = '1.2';
   return `
     <div class="tab-panel${activeTab === 'about' ? ' active' : ''}" id="panel-about" role="tabpanel" aria-labelledby="tab-about">
       <div class="panel-heading">
@@ -364,14 +364,14 @@ function buildAboutPanel(): string {
           </div>
           <div class="about-row">
             <span class="about-row-label">Backend Status</span>
-            <span id="backend-status" class="status-pill yellow">
-              <span style="width:6px;height:6px;border-radius:50%;background:#fbbf24;display:inline-block;"></span>
-              Checking…
+            <span id="backend-status" class="status-pill green">
+              <span style="width:6px;height:6px;border-radius:50%;background:var(--ag);display:inline-block;"></span>
+              Available
             </span>
           </div>
           <div class="about-row">
             <span class="about-row-label">License</span>
-            <span class="about-row-value">MIT</span>
+            <span class="about-row-value">All Rights Reserved</span>
           </div>
           <div class="about-row">
             <span class="about-row-label">Author</span>
@@ -422,7 +422,7 @@ function render(): void {
       <div class="site-header-title">Settings</div>
       <div class="site-header-spacer"></div>
       <div class="saved-badge" id="saved-badge" aria-live="polite">${I.check} Saved</div>
-      <div class="site-version">v1.0.0</div>
+      <div class="site-version">v1.2</div>
     </div>
 
     <div class="main-layout">
