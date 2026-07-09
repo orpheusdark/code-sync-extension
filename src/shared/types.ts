@@ -1,6 +1,12 @@
-export type Platform = 'leetcode' | 'gfg';
+/**
+ * CodeSync
+ * Original Author: orpheusdark
+ * Project: CodeSync Browser Extension
+ */
+export type Platform = 'leetcode' | 'gfg' | 'hackerrank';
 
-export type EnabledPlatformKey = Platform | 'hackerrank' | 'codeforces' | 'atcoder' | 'codechef';
+export type EnabledPlatformKey = Platform | 'codeforces' | 'atcoder' | 'codechef';
+
 
 export interface EnabledPlatforms {
   leetcode: boolean;
@@ -91,6 +97,7 @@ export interface SyncStats {
   totalSynced: number;
   leetcodeSynced: number;
   gfgSynced: number;
+  hackerrankSynced: number;
   repositoriesConnected: string[];
   lastSync?: string;
 }

@@ -1,8 +1,15 @@
+/**
+ * CodeSync
+ * Original Author: orpheusdark
+ * Project: CodeSync Browser Extension
+ */
 import type { PlatformAdapter } from './types';
 import { isLeetCodeProblemPage } from './leetcode/detector';
 import { extractLeetCodeSubmissionWithFallback } from './leetcode/extractor';
 import { isGfgAcceptedSubmission, isGfgProblemPage } from './gfg/detector';
 import { extractGfgSubmission } from './gfg/extractor';
+import { isHackerRankProblemPage, isHackerRankAcceptedSubmission } from './hackerrank/detector';
+import { extractHackerRankSubmission } from './hackerrank/extractor';
 
 export { detectPlatformFromHref, detectPlatformFromUrl } from './detect-url';
 
@@ -20,6 +27,13 @@ const ADAPTERS: PlatformAdapter[] = [
     extractSubmission: async () => extractGfgSubmission(),
     injectSyncButton: () => undefined,
     isSubmissionAccepted: isGfgAcceptedSubmission
+  },
+  {
+    platform: 'hackerrank',
+    detect: isHackerRankProblemPage,
+    extractSubmission: async () => extractHackerRankSubmission(),
+    injectSyncButton: () => undefined,
+    isSubmissionAccepted: isHackerRankAcceptedSubmission
   }
 ];
 

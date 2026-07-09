@@ -1,3 +1,8 @@
+/**
+ * CodeSync
+ * Original Author: orpheusdark
+ * Project: CodeSync Browser Extension
+ */
 export interface LeetCodeMetadata {
   title: string;
   problemId: string;

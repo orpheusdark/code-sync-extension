@@ -1,3 +1,8 @@
+/**
+ * CodeSync
+ * Original Author: orpheusdark
+ * Project: CodeSync Browser Extension
+ */
 export function extractTextBySelectors(selectors: string[], maxLength = 80): string {
   for (const selector of selectors) {
     const element = document.querySelector(selector);
@@ -32,20 +37,78 @@ export function extractSlugFromPathname(pathname: string, pattern = /\/problems\
   return decodeURIComponent(pathname.match(pattern)?.[1] ?? '').trim();
 }
 
-export function extractCodeFromDocument(): string {
-  const editorSelectors = [
-    '.monaco-editor .view-lines .view-line',
-    '.cm-content',
-    '[contenteditable="true"]',
-    'textarea',
-    'pre code'
-  ];
-
-  for (const selector of editorSelectors) {
-    const candidate = readCodeCandidate(selector);
-    if (looksLikeSolutionCode(candidate)) {
-      return candidate;
+/**
+ * Reads code directly from the Monaco editor model API.
+ * This avoids DOM scraping which is unreliable due to virtualisation.
+ * Monaco only renders visible lines in the DOM; the model contains all lines in order.
+ */
+export function readMonacoModelValue(): string {
+  try {
+    type MonacoEditor = {
+      getModels?: () => Array<{ getValue?: () => string; getLanguageId?: () => string }>;
+      getEditors?: () => Array<{ getValue?: () => string }>;
+    };
+    type MonacoWindow = Window & { monaco?: { editor?: MonacoEditor } };
+    const w = window as MonacoWindow;
+    const monacoEditor = w.monaco?.editor;
+    if (!monacoEditor) {
+      return '';
     }
+
+    // Try models first — each open file is a model
+    const models = monacoEditor.getModels?.() ?? [];
+    for (const model of models) {
+      const value = model.getValue?.()?.trim() ?? '';
+      if (looksLikeSolutionCode(value)) {
+        return value;
+      }
+    }
+
+    // Try editor instances
+    const editors = monacoEditor.getEditors?.() ?? [];
+    for (const editor of editors) {
+      const value = editor.getValue?.()?.trim() ?? '';
+      if (looksLikeSolutionCode(value)) {
+        return value;
+      }
+    }
+  } catch {
+    // Monaco API not available
+  }
+
+  return '';
+}
+
+/**
+ * Extracts code from the page using the Monaco editor API first (correct order),
+ * then falls back to CodeMirror content and textarea elements.
+ *
+ * IMPORTANT: Do NOT use .view-lines .view-line DOM scraping — Monaco virtualizes
+ * and positions lines with CSS `top`, so DOM order does not match source order.
+ */
+export function extractCodeFromDocument(): string {
+  // 1. Monaco editor API — reads directly from the model (correct order, all lines)
+  const monacoCode = readMonacoModelValue();
+  if (monacoCode) {
+    return monacoCode;
+  }
+
+  // 2. CodeMirror content (non-virtualised, used by some platforms)
+  const cmCandidate = readCodeCandidate('.cm-content');
+  if (looksLikeSolutionCode(cmCandidate)) {
+    return cmCandidate;
+  }
+
+  // 3. Plain <textarea> value (direct access, no DOM scraping)
+  const textareaValue = (document.querySelector('textarea') as HTMLTextAreaElement | null)?.value?.trim() ?? '';
+  if (looksLikeSolutionCode(textareaValue)) {
+    return textareaValue;
+  }
+
+  // 4. <pre><code> blocks (submission result pages)
+  const preCandidate = readCodeCandidate('pre code');
+  if (looksLikeSolutionCode(preCandidate)) {
+    return preCandidate;
   }
 
   return '';
@@ -80,10 +143,6 @@ function cleanupTitle(value: string, stripSuffixes: string[]): string {
 
 function readCodeCandidate(selector: string): string {
   const nodes = Array.from(document.querySelectorAll(selector));
-  if (selector === 'textarea') {
-    return (document.querySelector('textarea') as HTMLTextAreaElement | null)?.value?.trim() ?? '';
-  }
-
   return nodes
     .map((node) => node.textContent?.trim() ?? '')
     .filter(Boolean)

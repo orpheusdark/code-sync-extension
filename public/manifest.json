@@ -2,7 +2,8 @@
   "manifest_version": 3,
   "key": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA0XjwX1VMcCApIWJo4Sk/8h1VW4eaLOdHcxrld+1XC34F4RFAknDT0UNR+RIbfzjfACFF2suKizibRdtqkiKHXuIFlUbgK8FWH/T6MrX6Fh8Nr3daOtQqgXRdEO++KXR9/cBJqTo86a3Zs5RDCAtU3Gb8dZYb+RoOdHBesF6UvE7dfqFZlPLpkcxUth9pwiIoQj3naYQF0RyovuOwyVE1kVrzW3CVzFL7wxTN+OIcYGkcs5/t1mxohuVw8hyje5xSgeQRAOF9RkU2E51rYshZ8qOsUlrkByVripWzHIp7ncufotrMiiXBrJadkIR0PVqhC62DtHRcFnvLbhycdmFN6QIDAQAB",
   "name": "CodeSync Extension",
-  "version": "1.0.0",
+  "version": "1.1.0",
+  "author": "orpheusdark",
   "description": "Automatically sync accepted coding platform solutions to GitHub.",
   "permissions": ["storage", "tabs", "activeTab", "identity"],
   "host_permissions": [
@@ -10,6 +11,8 @@
     "https://*.leetcode.com/*",
     "https://practice.geeksforgeeks.org/*",
     "https://www.geeksforgeeks.org/*",
+    "https://www.hackerrank.com/*",
+    "https://hackerrank.com/*",
     "https://github.com/*",
     "https://code-sync-extension-backend.onrender.com/*"
   ],
@@ -23,7 +26,9 @@
         "https://leetcode.com/*",
         "https://*.leetcode.com/*",
         "https://practice.geeksforgeeks.org/*",
-        "https://www.geeksforgeeks.org/*"
+        "https://www.geeksforgeeks.org/*",
+        "https://www.hackerrank.com/*",
+        "https://hackerrank.com/*"
       ],
       "js": ["content/index.js"],
       "run_at": "document_idle"
@@ -58,7 +63,9 @@
         "https://leetcode.com/*",
         "https://*.leetcode.com/*",
         "https://practice.geeksforgeeks.org/*",
-        "https://www.geeksforgeeks.org/*"
+        "https://www.geeksforgeeks.org/*",
+        "https://www.hackerrank.com/*",
+        "https://hackerrank.com/*"
       ]
     }
   ]

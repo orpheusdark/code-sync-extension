@@ -1,3 +1,8 @@
+/**
+ * CodeSync
+ * Original Author: orpheusdark
+ * Project: CodeSync Browser Extension
+ */
 export const MESSAGE_TYPES = {
   SYNC_SUBMISSION: 'SYNC_SUBMISSION',
   AUTH_STATUS: 'AUTH_STATUS',

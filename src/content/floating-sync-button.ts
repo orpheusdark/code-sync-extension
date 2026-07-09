@@ -1,3 +1,8 @@
+/**
+ * CodeSync
+ * Original Author: orpheusdark
+ * Project: CodeSync Browser Extension
+ */
 const FLOATING_BUTTON_POSITION_KEY = 'codesync.floatingButtonPosition';
 
 function isExtensionContextValid(): boolean {

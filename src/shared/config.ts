@@ -1,3 +1,8 @@
+/**
+ * CodeSync
+ * Original Author: orpheusdark
+ * Project: CodeSync Browser Extension
+ */
 /** Stable extension ID when manifest.json includes a fixed `key` field. */
 export const STABLE_EXTENSION_ID = 'plnopbamiedbgmoopcngjnjflkeagebd';
 
