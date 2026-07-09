@@ -1,3 +1,8 @@
+/**
+ * CodeSync
+ * Original Author: orpheusdark
+ * Project: CodeSync Browser Extension
+ */
 export async function showNotification(message: string): Promise<void> {
   try {
     await chrome.notifications.create(undefined, {

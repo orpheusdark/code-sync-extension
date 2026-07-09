@@ -1,3 +1,8 @@
+/**
+ * CodeSync
+ * Original Author: orpheusdark
+ * Project: CodeSync Browser Extension
+ */
 import { DEFAULT_SETTINGS, STORAGE_KEYS } from '../shared/constants';
 import { APPEARANCE_KEY, applyAppearance, DEFAULT_APPEARANCE, type AppearanceSettings } from '../shared/appearance';
 import { MESSAGE_TYPES } from '../shared/messages';
@@ -42,7 +47,7 @@ const state: PopupState = {
   loadingBranches: false,
   settings: DEFAULT_SETTINGS,
   auth: { authenticated: false },
-  syncStats: { totalSynced: 0, leetcodeSynced: 0, gfgSynced: 0, repositoriesConnected: [] },
+  syncStats: { totalSynced: 0, leetcodeSynced: 0, gfgSynced: 0, hackerrankSynced: 0, repositoriesConnected: [] },
   showLogoutConfirm: false,
   appearance: DEFAULT_APPEARANCE,
 };
@@ -801,7 +806,7 @@ async function loadData(): Promise<void> {
   const [rawSettings, auth, syncStats, savedAppearance, pendingAuth] = await Promise.all([
     loadState<SyncSettings>(STORAGE_KEYS.SETTINGS, DEFAULT_SETTINGS),
     loadState<GitHubAuthState>(STORAGE_KEYS.AUTH, { authenticated: false }),
-    loadState<SyncStats>(STORAGE_KEYS.SYNC_STATS, { totalSynced: 0, leetcodeSynced: 0, gfgSynced: 0, repositoriesConnected: [] }),
+    loadState<SyncStats>(STORAGE_KEYS.SYNC_STATS, { totalSynced: 0, leetcodeSynced: 0, gfgSynced: 0, hackerrankSynced: 0, repositoriesConnected: [] }),
     loadState<AppearanceSettings>(APPEARANCE_KEY, DEFAULT_APPEARANCE),
     loadState<{ userCode?: string; verificationUriComplete?: string } | null>(STORAGE_KEYS.PENDING_DEVICE_AUTH, null),
   ]);

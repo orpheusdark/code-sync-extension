@@ -1,3 +1,8 @@
+/**
+ * CodeSync
+ * Original Author: orpheusdark
+ * Project: CodeSync Browser Extension
+ */
 import { MESSAGE_TYPES } from '../shared/messages';
 import { loadState, saveState } from '../shared/storage';
 import { DEFAULT_SETTINGS, STORAGE_KEYS } from '../shared/constants';
@@ -16,6 +21,7 @@ async function updateSyncStats(submission: SubmissionPayload): Promise<void> {
     totalSynced: 0,
     leetcodeSynced: 0,
     gfgSynced: 0,
+    hackerrankSynced: 0,
     repositoriesConnected: []
   });
 
@@ -30,6 +36,7 @@ async function updateSyncStats(submission: SubmissionPayload): Promise<void> {
     totalSynced: currentStats.totalSynced + 1,
     leetcodeSynced: currentStats.leetcodeSynced + (submission.platform === 'leetcode' ? 1 : 0),
     gfgSynced: currentStats.gfgSynced + (submission.platform === 'gfg' ? 1 : 0),
+    hackerrankSynced: (currentStats.hackerrankSynced ?? 0) + (submission.platform === 'hackerrank' ? 1 : 0),
     repositoriesConnected,
     lastSync: new Date().toISOString()
   });

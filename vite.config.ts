@@ -1,3 +1,8 @@
+/**
+ * CodeSync
+ * Original Author: orpheusdark
+ * Project: CodeSync Browser Extension
+ */
 import { defineConfig, type Plugin } from 'vite';
 
 function isolateContentScript(): Plugin {

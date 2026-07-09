@@ -1,3 +1,8 @@
+/**
+ * CodeSync
+ * Original Author: orpheusdark
+ * Project: CodeSync Browser Extension
+ */
 export async function loadState<T>(key: string, fallback: T): Promise<T> {
   const result = await chrome.storage.local.get(key);
   return result[key] ?? fallback;

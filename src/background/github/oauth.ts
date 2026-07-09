@@ -1,3 +1,8 @@
+/**
+ * CodeSync
+ * Original Author: orpheusdark
+ * Project: CodeSync Browser Extension
+ */
 import { CONFIG, getApiUrl, getOAuthRedirectUri } from '../../shared/config';
 import { MESSAGE_TYPES } from '../../shared/messages';
 import { saveState } from '../../shared/storage';
