@@ -1,6 +1,7 @@
 import { DEFAULT_SETTINGS, STORAGE_KEYS } from '../../shared/constants';
 import { loadState } from '../../shared/storage';
 import type { SubmissionPayload, SyncSettings } from '../../shared/types';
+import { resolveLanguageExtension } from '../../shared/language-map';
 
 export interface SyncResult {
   ok: boolean;
@@ -139,110 +140,4 @@ function normalizeProblemTitle(value: string): string {
 
 function toGitHubBlobPath(path: string): string {
   return path.split('/').map(encodeURIComponent).join('/').replace(/%2F/g, '/');
-}
-
-function resolveLanguageExtension(language: string, code = ''): string {
-  const normalized = language.toLowerCase().replace(/\s+/g, ' ').trim();
-  const codeNormalized = code.trim();
-
-  const languageToExtension: Record<string, string> = {
-    'python': 'py',
-    'python 3': 'py',
-    'python3': 'py',
-    'py': 'py',
-    'javascript': 'js',
-    'javascript (node.js)': 'js',
-    'javascript (node)': 'js',
-    'node.js': 'js',
-    'js': 'js',
-    'typescript': 'ts',
-    'ts': 'ts',
-    'java': 'java',
-    'java 8': 'java',
-    'java 11': 'java',
-    'java 17': 'java',
-    'c#': 'cs',
-    'c sharp': 'cs',
-    'csharp': 'cs',
-    'cs': 'cs',
-    'c++': 'cpp',
-    'cpp': 'cpp',
-    'c plus plus': 'cpp',
-    'c': 'c',
-    'c language': 'c',
-    'go': 'go',
-    'golang': 'go',
-    'rust': 'rs',
-    'kotlin': 'kt',
-    'swift': 'swift',
-    'php': 'php',
-    'ruby': 'rb',
-    'scala': 'scala',
-    'dart': 'dart'
-  };
-
-  if (languageToExtension[normalized]) {
-    return languageToExtension[normalized];
-  }
-
-  if (normalized.includes('python')) return 'py';
-  if (normalized.includes('javascript') || normalized.includes('node.js')) return 'js';
-  if (normalized.includes('typescript')) return 'ts';
-  if (normalized.includes('java')) return 'java';
-  if (normalized.includes('c#') || normalized.includes('csharp') || normalized.includes('c sharp')) return 'cs';
-  if (normalized.includes('c++') || normalized.includes('cpp') || normalized.includes('c plus plus')) return 'cpp';
-  if (normalized === 'c' || normalized.includes('c language')) return 'c';
-  if (normalized.includes('go') || normalized.includes('golang')) return 'go';
-  if (normalized.includes('rust')) return 'rs';
-  if (normalized.includes('kotlin')) return 'kt';
-  if (normalized.includes('swift')) return 'swift';
-  if (normalized.includes('php')) return 'php';
-  if (normalized.includes('ruby')) return 'rb';
-  if (normalized.includes('scala')) return 'scala';
-  if (normalized.includes('dart')) return 'dart';
-
-  if (looksLikePython(codeNormalized)) return 'py';
-  if (looksLikeJava(codeNormalized)) return 'java';
-  if (looksLikeJavaScript(codeNormalized)) return 'js';
-  if (looksLikeTypeScript(codeNormalized)) return 'ts';
-  if (looksLikeCpp(codeNormalized)) return 'cpp';
-  if (looksLikeCSharp(codeNormalized)) return 'cs';
-  if (looksLikeGo(codeNormalized)) return 'go';
-
-  return 'txt';
-}
-
-function looksLikePython(code: string): boolean {
-  if (!code) return false;
-  return /(^|\n)\s*def\s+\w+\s*\(/.test(code) || /(^|\n)\s*class\s+\w+\s*:/.test(code) || /(^|\n)\s*if\s+__name__\s*==\s*['"]__main__['"]\s*:/.test(code);
-}
-
-function looksLikeJava(code: string): boolean {
-  if (!code) return false;
-  return /\bpublic\s+class\s+\w+/.test(code) || /\bimport\s+java\./.test(code) || /\bSystem\.out\.print/.test(code);
-}
-
-function looksLikeJavaScript(code: string): boolean {
-  if (!code) return false;
-  return /\bfunction\s+\w+\s*\(/.test(code) || /\bconst\s+\w+\s*=/.test(code) || /\blet\s+\w+\s*=/.test(code) || /=>/.test(code);
-}
-
-function looksLikeTypeScript(code: string): boolean {
-  if (!code) return false;
-  return /:\s*(string|number|boolean|any|unknown)\b/.test(code) || /\binterface\s+\w+/.test(code) || /\btype\s+\w+\s*=/.test(code);
-}
-
-function looksLikeCpp(code: string): boolean {
-  if (!code) return false;
-  return /#include\s*<.*>/.test(code) || /\bstd::/.test(code) || /\busing\s+namespace\s+std\b/.test(code);
-}
-
-function looksLikeCSharp(code: string): boolean {
-  if (!code) return false;
-  return /\busing\s+System\b/.test(code) || /\bnamespace\s+\w+/.test(code) || /\bConsole\.Write(Line)?\b/.test(code);
-}
-
-function looksLikeGo(code: string): boolean {
-  if (!code) return false;
-  return /\bpackage\s+main\b/.test(code) || /\bfunc\s+\w+\s*\(/.test(code) || /\bfmt\./.test(code);
 }

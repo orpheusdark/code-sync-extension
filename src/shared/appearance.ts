@@ -1,3 +1,8 @@
+/**
+ * CodeSync
+ * Original Author: orpheusdark
+ * Project: CodeSync Browser Extension
+ */
 export interface AppearanceSettings {
   theme: 'system' | 'dark' | 'light' | 'oled';
   accent: 'blue' | 'purple' | 'green' | 'orange' | 'red';

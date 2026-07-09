@@ -1,3 +1,8 @@
+/**
+ * CodeSync
+ * Original Author: orpheusdark
+ * Project: CodeSync Browser Extension
+ */
 import type { EnabledPlatformKey, SubmissionPayload } from '../shared/types';
 
 export type PlatformId = SubmissionPayload['platform'] | EnabledPlatformKey;
@@ -7,5 +12,5 @@ export interface PlatformAdapter {
   detect(): boolean;
   extractSubmission(): Promise<SubmissionPayload | null>;
   injectSyncButton(): void;
-  isSubmissionAccepted(): boolean;
+  isSubmissionAccepted(): boolean | Promise<boolean>;
 }

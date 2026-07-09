@@ -1,3 +1,8 @@
+/**
+ * CodeSync
+ * Original Author: orpheusdark
+ * Project: CodeSync Browser Extension
+ */
 import type { SubmissionPayload } from '../../shared/types';
 import {
   extractLanguageFromDocument,

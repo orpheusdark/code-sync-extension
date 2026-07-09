@@ -1,3 +1,8 @@
+/**
+ * CodeSync
+ * Original Author: orpheusdark
+ * Project: CodeSync Browser Extension
+ */
 import type { PlatformId } from './types';
 
 export function detectPlatformFromUrl(hostname: string, pathname: string): PlatformId | null {
@@ -12,7 +17,7 @@ export function detectPlatformFromUrl(hostname: string, pathname: string): Platf
     return 'gfg';
   }
 
-  if (/hackerrank\.com$/.test(host) && /^\/(challenges|contests|practice|dashboard)/.test(path)) {
+  if (/hackerrank\.com$/.test(host) && /^\/(challenges|contests|domains|tracks|practice)\/.+/.test(path)) {
     return 'hackerrank';
   }
 

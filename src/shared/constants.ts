@@ -1,3 +1,10 @@
+/**
+ * CodeSync
+ * Original Author: orpheusdark
+ * Project: CodeSync Browser Extension
+ */
+import type { SyncSettings } from './types';
+
 export const DEFAULT_SETTINGS: SyncSettings = {
   repository: '',
   branch: 'main',
@@ -8,13 +15,14 @@ export const DEFAULT_SETTINGS: SyncSettings = {
   enabledPlatforms: {
     leetcode: true,
     gfg: true,
-    hackerrank: false,
+    hackerrank: true,
     codeforces: false,
     atcoder: false,
     codechef: false
   },
   duplicateDetection: true
 };
+
 
 export const STORAGE_KEYS = {
   SETTINGS: 'codesync.settings',

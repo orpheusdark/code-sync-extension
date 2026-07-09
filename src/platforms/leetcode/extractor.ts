@@ -1,5 +1,10 @@
+/**
+ * CodeSync
+ * Original Author: orpheusdark
+ * Project: CodeSync Browser Extension
+ */
 import type { SubmissionPayload } from '../../shared/types';
-import { extractCodeFromDocument, extractLanguageFromDocument, extractProblemTitleFromDocument, extractSlugFromPathname, extractTextBySelectors } from '../extraction-utils';
+import { extractCodeFromDocument, readMonacoModelValue, extractLanguageFromDocument, extractProblemTitleFromDocument, extractSlugFromPathname, extractTextBySelectors } from '../extraction-utils';
 
 interface LeetCodeSubmissionDetailsResponse {
   data?: {
@@ -48,16 +53,74 @@ function readProblemNumberFromPage(): string {
   return '';
 }
 
+/**
+ * Attempts to determine the programming language through multiple sources in priority order.
+ * Priority: URL param → __NEXT_DATA__ JSON → Monaco editor API → DOM selectors.
+ * This prevents falling through to the 'Unknown' / '.txt' fallback.
+ */
 function extractLanguage(): string {
+  // 1. URL query parameter (?lang=cpp or ?langSlug=cpp)
+  try {
+    const params = new URLSearchParams(window.location.search);
+    const urlLang = params.get('lang') || params.get('langSlug') || params.get('language');
+    if (urlLang && urlLang.trim()) {
+      return urlLang.trim();
+    }
+  } catch { /* continue */ }
+
+  // 2. Extract from __NEXT_DATA__ — LeetCode embeds this in the HTML with the current editor language
+  try {
+    const nextData = (window as Window & { __NEXT_DATA__?: unknown }).__NEXT_DATA__;
+    if (nextData) {
+      const json = JSON.stringify(nextData);
+      // Match langSlug or langName fields that contain language identifiers
+      const langSlugMatch = json.match(/"langSlug":\s*"([^"]+)"/);
+      const langNameMatch = json.match(/"langName":\s*"([^"]+)"/);
+      const lang = langSlugMatch?.[1] || langNameMatch?.[1];
+      if (lang && lang !== 'all') {
+        return lang;
+      }
+    }
+  } catch { /* continue */ }
+
+  // 3. Monaco editor language metadata (available when editor is mounted)
+  try {
+    type MonacoWindow = Window & { monaco?: { editor?: { getModels?: () => Array<{ getLanguageId?: () => string }> } } };
+    const monacoModels = (window as MonacoWindow).monaco?.editor?.getModels?.();
+    if (monacoModels && monacoModels.length > 0) {
+      const monacoLang = monacoModels[0].getLanguageId?.();
+      if (monacoLang && monacoLang !== 'plaintext' && monacoLang !== 'unknown') {
+        return monacoLang;
+      }
+    }
+  } catch { /* continue */ }
+
+  // 4. DOM selectors — the language dropdown button text
   return extractLanguageFromDocument([
     '[data-e2e-langs-dropdown] button',
     '[data-e2e-langs-dropdown]',
     'button[id*="headlessui-listbox-button"]',
-    'button[aria-haspopup="listbox"]'
+    'button[aria-haspopup="listbox"]',
+    '[class*="lang"] button',
+    '[class*="language"] button',
+    'button[class*="lang"]'
   ]);
 }
 
+/**
+ * Extracts the LeetCode solution code.
+ * Priority:
+ *   1. Monaco editor model API (correct line order, all lines)
+ *   2. Generic document extraction (CodeMirror, textarea, pre>code)
+ */
 function extractCode(): string {
+  // Monaco API gives the exact source including all lines and correct order
+  const monacoCode = readMonacoModelValue();
+  if (monacoCode) {
+    return monacoCode;
+  }
+
+  // Generic fallback (CodeMirror, textarea, pre>code)
   return extractCodeFromDocument();
 }
 
@@ -159,10 +222,10 @@ export async function extractLeetCodeSubmissionFromGraphQL(): Promise<Submission
 }
 
 export async function extractLeetCodeSubmissionWithFallback(): Promise<SubmissionPayload | null> {
-  const direct = extractLeetCodeSubmission();
-  if (direct) {
-    return direct;
+  const graphql = await extractLeetCodeSubmissionFromGraphQL();
+  if (graphql) {
+    return graphql;
   }
 
-  return extractLeetCodeSubmissionFromGraphQL();
+  return extractLeetCodeSubmission();
 }

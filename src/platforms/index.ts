@@ -1,3 +1,8 @@
+/**
+ * CodeSync
+ * Original Author: orpheusdark
+ * Project: CodeSync Browser Extension
+ */
 import { detectActivePlatform } from './registry';
 
 export function detectAndExtractSubmission() {

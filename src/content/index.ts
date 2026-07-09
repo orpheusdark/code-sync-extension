@@ -1,3 +1,8 @@
+/**
+ * CodeSync
+ * Original Author: orpheusdark
+ * Project: CodeSync Browser Extension
+ */
 import type { SubmissionPayload, SyncSettings } from '../shared/types';
 import { detectActivePlatform } from '../platforms/registry';
 import type { PlatformAdapter } from '../platforms/types';
@@ -22,13 +27,14 @@ const DEFAULT_SETTINGS: SyncSettings = {
   enabledPlatforms: {
     leetcode: true,
     gfg: true,
-    hackerrank: false,
+    hackerrank: true,
     codeforces: false,
     atcoder: false,
     codechef: false
   },
   duplicateDetection: true
 };
+
 
 type ButtonState = 'idle' | 'loading' | 'success' | 'failure' | 'duplicate';
 
@@ -141,7 +147,7 @@ async function syncCurrentSolution(adapter: PlatformAdapter): Promise<void> {
     return;
   }
 
-  if (!adapter.isSubmissionAccepted()) {
+  if (!(await adapter.isSubmissionAccepted())) {
     setButtonState('failure');
     showToast('Submit an accepted solution first.', 'error');
     resetButtonSoon();

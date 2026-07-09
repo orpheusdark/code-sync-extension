@@ -1,3 +1,8 @@
+/**
+ * CodeSync
+ * Original Author: orpheusdark
+ * Project: CodeSync Browser Extension
+ */
 import { STORAGE_KEYS } from '../../shared/constants';
 import { CONFIG } from '../../shared/config';
 import { saveState } from '../../shared/storage';
