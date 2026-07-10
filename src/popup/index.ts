@@ -8,6 +8,7 @@ import { APPEARANCE_KEY, applyAppearance, DEFAULT_APPEARANCE, type AppearanceSet
 import { MESSAGE_TYPES } from '../shared/messages';
 import { loadState, saveState } from '../shared/storage';
 import type { GitHubAuthState, GitHubBranch, GitHubRepository, SyncSettings, SyncStats } from '../shared/types';
+import { setHTML } from '../shared/dom';
 
 const app = document.getElementById('app')!;
 
@@ -418,7 +419,7 @@ function render(): void {
     html = connected ? buildConnectedHome() : buildDisconnectedHome();
   }
 
-  app.innerHTML = html;
+  setHTML(app, html);
 
   // Trigger entrance animation
   app.classList.remove('view-enter');
@@ -564,11 +565,11 @@ function updateRepoList(): void {
   const filtered = state.repositories.filter(r => r.full_name.toLowerCase().includes(query));
 
   if (filtered.length === 0) {
-    list.innerHTML = `<div class="picker-empty">No repositories found</div>`;
+    setHTML(list, `<div class="picker-empty">No repositories found</div>`);
     return;
   }
 
-  list.innerHTML = filtered.map(repo => {
+  setHTML(list, filtered.map(repo => {
     const selected = state.settings.repository === repo.full_name;
     return `
       <div class="picker-item${selected ? ' selected' : ''}" data-repo="${escHtml(repo.full_name)}" data-branch="${escHtml(repo.default_branch)}" role="option" aria-selected="${selected}" tabindex="0">
@@ -581,7 +582,7 @@ function updateRepoList(): void {
           ${selected ? `<span style="color:var(--a1);margin-left:4px;">${I.check}</span>` : ''}
         </div>
       </div>`;
-  }).join('');
+  }).join(''));
 
   bindRepoItems();
 }

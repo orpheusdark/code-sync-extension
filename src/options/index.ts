@@ -3,6 +3,7 @@ import { APPEARANCE_KEY, applyAppearance, DEFAULT_APPEARANCE, type AppearanceSet
 import { PLATFORM_OPTIONS } from '../shared/platform-logos';
 import { loadState, saveState } from '../shared/storage';
 import type { SyncSettings } from '../shared/types';
+import { setHTML } from '../shared/dom';
 
 // ================================================================
 // TYPES & CONSTANTS
@@ -412,7 +413,7 @@ function render(): void {
   const app = document.getElementById('app');
   if (!app) return;
 
-  app.innerHTML = `
+  const html = `
     <div class="site-header">
       <div class="site-logo-group">
         <img class="logo-mark" src="icons/icon32.png" alt="" width="28" height="28" />
@@ -446,6 +447,7 @@ function render(): void {
       <button type="button" class="btn-discard" id="btn-discard">Discard</button>
     </div>
   `;
+  setHTML(app, html);
 
   applyAppearance(appearance);
   bindEvents();
@@ -489,11 +491,11 @@ function bindEvents(): void {
       if (input.checked) {
         card?.classList.add('enabled');
         if (statusEl) statusEl.textContent = 'Enabled';
-        if (checkEl) checkEl.innerHTML = I.check;
+        if (checkEl) setHTML(checkEl, I.check);
       } else {
         card?.classList.remove('enabled');
         if (statusEl) statusEl.textContent = 'Disabled';
-        if (checkEl) checkEl.innerHTML = '';
+        if (checkEl) checkEl.textContent = '';
       }
     });
   });
@@ -616,13 +618,13 @@ async function checkBackendStatus(): Promise<void> {
     const res = await fetch('https://code-sync-extension-backend.onrender.com/health', { signal: AbortSignal.timeout(5000) });
     if (res.ok) {
       el.className = 'status-pill green';
-      el.innerHTML = `<span style="width:6px;height:6px;border-radius:50%;background:var(--ag);display:inline-block;"></span> Online`;
+      setHTML(el, `<span style="width:6px;height:6px;border-radius:50%;background:var(--ag);display:inline-block;"></span> Online`);
     } else {
       throw new Error('not ok');
     }
   } catch {
     el.className = 'status-pill yellow';
-    el.innerHTML = `<span style="width:6px;height:6px;border-radius:50%;background:#fbbf24;display:inline-block;"></span> Unavailable`;
+    setHTML(el, `<span style="width:6px;height:6px;border-radius:50%;background:#fbbf24;display:inline-block;"></span> Unavailable`);
   }
 }
 

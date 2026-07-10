@@ -4,6 +4,14 @@
   "name": "CodeSync Extension",
   "version": "1.1.0",
   "author": "orpheusdark",
+  "browser_specific_settings": {
+    "gecko": {
+      "id": "code-sync@orpheusdark.com",
+      "data_collection_permissions": {
+        "required": ["none"]
+      }
+    }
+  },
   "description": "Automatically sync accepted coding platform solutions to GitHub.",
   "permissions": ["storage", "tabs", "activeTab", "identity"],
   "host_permissions": [
@@ -17,7 +25,7 @@
     "https://code-sync-extension-backend.onrender.com/*"
   ],
   "background": {
-    "service_worker": "background/index.js",
+    "scripts": ["background/index.js"],
     "type": "module"
   },
   "content_scripts": [
