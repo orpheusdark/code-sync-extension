@@ -5,6 +5,18 @@
  */
 const FLOATING_BUTTON_POSITION_KEY = 'codesync.floatingButtonPosition';
 
+function setHTML(element: Element | DocumentFragment, html: string): void {
+  const parser = new DOMParser();
+  const doc = parser.parseFromString(html, 'text/html');
+  element.textContent = '';
+  while (doc.head.firstChild) {
+    element.appendChild(doc.head.firstChild);
+  }
+  while (doc.body.firstChild) {
+    element.appendChild(doc.body.firstChild);
+  }
+}
+
 function isExtensionContextValid(): boolean {
   try {
     return Boolean(chrome.runtime?.id);
@@ -67,7 +79,7 @@ export class FloatingSyncButton {
     this.host.style.background = 'transparent';
 
     this.shadow = this.host.attachShadow({ mode: 'open' });
-    this.shadow.innerHTML = `
+    const shadowHtml = `
       <style>
         :host {
           color-scheme: light dark;
@@ -261,6 +273,8 @@ export class FloatingSyncButton {
       </div>
     `;
 
+    setHTML(this.shadow, shadowHtml);
+
     const button = this.shadow.getElementById('button');
     const content = this.shadow.getElementById('content');
     const toast = this.shadow.getElementById('toast');
@@ -343,45 +357,45 @@ export class FloatingSyncButton {
 
   private renderContent(state: FloatingSyncButtonState): void {
     if (state === 'loading') {
-      this.content.innerHTML = `
+      setHTML(this.content, `
         <span class="spinner" aria-hidden="true"></span>
         <span class="label">Syncing…</span>
-      `;
+      `);
       this.button.setAttribute('aria-label', 'Syncing with Code Sync');
       return;
     }
 
     if (state === 'success') {
-      this.content.innerHTML = `
+      setHTML(this.content, `
         <span class="icon">${checkIconSvg()}</span>
         <span class="label">Synced</span>
-      `;
+      `);
       this.button.setAttribute('aria-label', 'Synced to GitHub');
       return;
     }
 
     if (state === 'failure') {
-      this.content.innerHTML = `
+      setHTML(this.content, `
         <span class="icon">${retryIconSvg()}</span>
         <span class="label">Retry</span>
-      `;
+      `);
       this.button.setAttribute('aria-label', 'Retry sync with Code Sync');
       return;
     }
 
     if (state === 'duplicate') {
-      this.content.innerHTML = `
+      setHTML(this.content, `
         <span class="icon">${checkIconSvg()}</span>
         <span class="label">Already synced</span>
-      `;
+      `);
       this.button.setAttribute('aria-label', 'Already synced with Code Sync');
       return;
     }
 
-    this.content.innerHTML = `
+    setHTML(this.content, `
       <img class="logo" src="${this.logoUrl}" alt="" width="24" height="24" />
       <span class="label">Code Sync</span>
-    `;
+    `);
     this.button.setAttribute('aria-label', 'Sync with Code Sync');
   }
 

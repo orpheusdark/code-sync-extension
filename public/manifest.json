@@ -4,6 +4,14 @@
   "name": "CodeSync Extension",
   "version": "1.1.0",
   "author": "orpheusdark",
+  "browser_specific_settings": {
+    "gecko": {
+      "id": "code-sync@orpheusdark.com",
+      "data_collection_permissions": {
+        "required": ["none"]
+      }
+    }
+  },
   "description": "Automatically sync accepted coding platform solutions to GitHub.",
   "permissions": ["storage", "tabs", "activeTab", "identity"],
   "host_permissions": [
@@ -13,6 +21,8 @@
     "https://www.geeksforgeeks.org/*",
     "https://www.hackerrank.com/*",
     "https://hackerrank.com/*",
+    "https://*.codingninjas.com/*",
+    "https://*.naukri.com/*",
     "https://github.com/*",
     "https://code-sync-extension-backend.onrender.com/*"
   ],
@@ -28,7 +38,9 @@
         "https://practice.geeksforgeeks.org/*",
         "https://www.geeksforgeeks.org/*",
         "https://www.hackerrank.com/*",
-        "https://hackerrank.com/*"
+        "https://hackerrank.com/*",
+        "https://*.codingninjas.com/*",
+        "https://*.naukri.com/*"
       ],
       "js": ["content/index.js"],
       "run_at": "document_idle"
@@ -65,7 +77,9 @@
         "https://practice.geeksforgeeks.org/*",
         "https://www.geeksforgeeks.org/*",
         "https://www.hackerrank.com/*",
-        "https://hackerrank.com/*"
+        "https://hackerrank.com/*",
+        "https://*.codingninjas.com/*",
+        "https://*.naukri.com/*"
       ]
     }
   ]
