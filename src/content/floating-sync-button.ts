@@ -4,7 +4,18 @@
  * Project: CodeSync Browser Extension
  */
 const FLOATING_BUTTON_POSITION_KEY = 'codesync.floatingButtonPosition';
-import { setHTML } from '../shared/dom';
+
+function setHTML(element: Element | DocumentFragment, html: string): void {
+  const parser = new DOMParser();
+  const doc = parser.parseFromString(html, 'text/html');
+  element.textContent = '';
+  while (doc.head.firstChild) {
+    element.appendChild(doc.head.firstChild);
+  }
+  while (doc.body.firstChild) {
+    element.appendChild(doc.body.firstChild);
+  }
+}
 
 function isExtensionContextValid(): boolean {
   try {

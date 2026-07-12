@@ -14,7 +14,8 @@ export const PLATFORM_LOGO_FILES: Record<PlatformLogoKey, string> = {
   hackerrank: 'hackerrank.svg',
   codeforces: 'codeforces.svg',
   atcoder: 'atcoder.svg',
-  codechef: 'codechef.svg'
+  codechef: 'codechef.svg',
+  codingninjas: 'codingninjas.svg'
 };
 
 export interface PlatformCatalogEntry {
@@ -29,7 +30,8 @@ export const PLATFORM_CATALOG: PlatformCatalogEntry[] = [
   { key: 'hackerrank', label: 'HackerRank', desc: 'Skills assessment' },
   { key: 'codeforces', label: 'Codeforces', desc: 'Competitive programming' },
   { key: 'atcoder', label: 'AtCoder', desc: 'Japanese CP platform' },
-  { key: 'codechef', label: 'CodeChef', desc: 'Competitive programming' }
+  { key: 'codechef', label: 'CodeChef', desc: 'Competitive programming' },
+  { key: 'codingninjas', label: 'Coding Ninjas', desc: 'Coding practice platform' }
 ];
 
 export function getPlatformLabel(platform: PlatformLogoKey | null | undefined): string {

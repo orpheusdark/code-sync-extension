@@ -27,7 +27,7 @@ export async function syncSubmissionToGitHub(payload: SubmissionPayload, setting
   const title = normalizeProblemTitle(payload.title);
   const extension = resolveLanguageExtension(payload.language, payload.code);
   const platformFolder = resolvePlatformFolder(payload.platform);
-  const fileName = payload.platform === 'gfg' ? `${title}.${extension}` : `${problemNumber}. ${title}.${extension}`;
+  const fileName = payload.platform === 'leetcode' ? `${problemNumber}. ${title}.${extension}` : `${title}.${extension}`;
   const filePath = `${platformFolder}/${fileName}`;
   const existingFile = await getGitHubFile(repo, branch, auth.token, filePath);
 
@@ -119,15 +119,25 @@ function normalizeProblemNumber(value: string): string {
 }
 
 function resolvePlatformFolder(platform: SubmissionPayload['platform']): string {
-  return platform === 'gfg' ? 'GeeksForGeeks' : 'LeetCode';
+  switch (platform) {
+    case 'gfg': return 'GeeksForGeeks';
+    case 'hackerrank': return 'HackerRank';
+    case 'codingninjas': return 'CodingNinjas';
+    case 'leetcode':
+    default:
+      return 'LeetCode';
+  }
 }
 
 function buildCommitMessage(platform: SubmissionPayload['platform'], title: string, isUpdate: boolean): string {
-  if (platform === 'gfg') {
-    return `${isUpdate ? 'Update' : 'Add'} GFG solution: ${title}`;
+  switch (platform) {
+    case 'gfg': return `${isUpdate ? 'Update' : 'Add'} GFG solution: ${title}`;
+    case 'hackerrank': return `${isUpdate ? 'Update' : 'Add'} HackerRank solution: ${title}`;
+    case 'codingninjas': return `${isUpdate ? 'Update' : 'Add'} Coding Ninjas solution: ${title}`;
+    case 'leetcode':
+    default:
+      return `Solved ${title}`;
   }
-
-  return `Solved ${title}`;
 }
 
 function normalizeProblemTitle(value: string): string {

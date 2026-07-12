@@ -18,7 +18,8 @@ export const DEFAULT_SETTINGS: SyncSettings = {
     hackerrank: true,
     codeforces: false,
     atcoder: false,
-    codechef: false
+    codechef: false,
+    codingninjas: true
   },
   duplicateDetection: true
 };

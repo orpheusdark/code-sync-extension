@@ -10,6 +10,8 @@ import { isGfgAcceptedSubmission, isGfgProblemPage } from './gfg/detector';
 import { extractGfgSubmission } from './gfg/extractor';
 import { isHackerRankProblemPage, isHackerRankAcceptedSubmission } from './hackerrank/detector';
 import { extractHackerRankSubmission } from './hackerrank/extractor';
+import { isCodingNinjasProblemPage, isCodingNinjasAcceptedSubmission } from './codingninjas/detector';
+import { extractCodingNinjasSubmission } from './codingninjas/extractor';
 
 export { detectPlatformFromHref, detectPlatformFromUrl } from './detect-url';
 
@@ -34,6 +36,13 @@ const ADAPTERS: PlatformAdapter[] = [
     extractSubmission: async () => extractHackerRankSubmission(),
     injectSyncButton: () => undefined,
     isSubmissionAccepted: isHackerRankAcceptedSubmission
+  },
+  {
+    platform: 'codingninjas',
+    detect: isCodingNinjasProblemPage,
+    extractSubmission: async () => extractCodingNinjasSubmission(),
+    injectSyncButton: () => undefined,
+    isSubmissionAccepted: isCodingNinjasAcceptedSubmission
   }
 ];
 

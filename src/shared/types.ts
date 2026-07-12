@@ -3,7 +3,7 @@
  * Original Author: orpheusdark
  * Project: CodeSync Browser Extension
  */
-export type Platform = 'leetcode' | 'gfg' | 'hackerrank';
+export type Platform = 'leetcode' | 'gfg' | 'hackerrank' | 'codingninjas';
 
 export type EnabledPlatformKey = Platform | 'codeforces' | 'atcoder' | 'codechef';
 
@@ -12,6 +12,7 @@ export interface EnabledPlatforms {
   leetcode: boolean;
   gfg: boolean;
   hackerrank: boolean;
+  codingninjas: boolean;
   codeforces: boolean;
   atcoder: boolean;
   codechef: boolean;
@@ -98,6 +99,7 @@ export interface SyncStats {
   leetcodeSynced: number;
   gfgSynced: number;
   hackerrankSynced: number;
+  codingninjasSynced: number;
   repositoriesConnected: string[];
   lastSync?: string;
 }

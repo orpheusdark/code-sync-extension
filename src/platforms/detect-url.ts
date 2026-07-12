@@ -21,6 +21,10 @@ export function detectPlatformFromUrl(hostname: string, pathname: string): Platf
     return 'hackerrank';
   }
 
+  if (/(codingninjas\.com|naukri\.com)$/.test(host) && /\/(codestudio|studio|code360)?\/?problems\/.+/.test(path)) {
+    return 'codingninjas';
+  }
+
   if (/codeforces\.com$/.test(host) && /^\/(problemset|contest)/.test(path)) {
     return 'codeforces';
   }
