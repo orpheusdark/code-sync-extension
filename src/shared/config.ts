@@ -17,7 +17,7 @@ export const CONFIG = {
   GITHUB_API: 'https://api.github.com',
   GITHUB_CLIENT_ID,
   /** Web OAuth via chrome.identity is attempted first; device flow is the fallback. */
-  USE_WEB_OAUTH_FLOW: true
+  USE_WEB_OAUTH_FLOW: typeof navigator !== 'undefined' && !navigator.userAgent.toLowerCase().includes('firefox')
 };
 
 export function getApiUrl(path: string): string {
