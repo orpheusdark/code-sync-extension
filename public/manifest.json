@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "key": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA0XjwX1VMcCApIWJo4Sk/8h1VW4eaLOdHcxrld+1XC34F4RFAknDT0UNR+RIbfzjfACFF2suKizibRdtqkiKHXuIFlUbgK8FWH/T6MrX6Fh8Nr3daOtQqgXRdEO++KXR9/cBJqTo86a3Zs5RDCAtU3Gb8dZYb+RoOdHBesF6UvE7dfqFZlPLpkcxUth9pwiIoQj3naYQF0RyovuOwyVE1kVrzW3CVzFL7wxTN+OIcYGkcs5/t1mxohuVw8hyje5xSgeQRAOF9RkU2E51rYshZ8qOsUlrkByVripWzHIp7ncufotrMiiXBrJadkIR0PVqhC62DtHRcFnvLbhycdmFN6QIDAQAB",
   "name": "CodeSync Extension",
-  "version": "1.1.1",
+  "version": "1.1.2",
   "author": "orpheusdark",
   "browser_specific_settings": {
     "gecko": {
