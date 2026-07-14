@@ -40,7 +40,7 @@ function readProblemNumberFromPage(): string {
     document.querySelector('[data-cy="question-title"]')?.textContent?.trim() ?? '',
     document.title.replace(' - LeetCode', '').trim(),
     (window as Window & { __NEXT_DATA__?: unknown }).__NEXT_DATA__ ? JSON.stringify((window as Window & { __NEXT_DATA__?: unknown }).__NEXT_DATA__) : '',
-    document.documentElement.innerHTML
+    document.documentElement.outerHTML
   ];
 
   for (const candidate of candidates) {
