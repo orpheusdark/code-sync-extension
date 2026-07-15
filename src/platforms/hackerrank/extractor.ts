@@ -33,6 +33,7 @@ import {
   looksLikeSolutionCode,
   readMonacoModelValue
 } from '../extraction-utils';
+import { extractTopics } from '../topics';
 
 // Language selector selectors specific to HackerRank
 const HR_LANGUAGE_SELECTORS = [
@@ -388,6 +389,7 @@ export function extractHackerRankSubmission(): SubmissionPayload | null {
   // Build a source string that encodes the domain for folder resolution in sync.ts
   // e.g. 'hackerrank-algorithms' → folder 'Algorithms'
   const source = domain ? `hackerrank-${domain}` : 'hackerrank';
+  const { primaryTopic, topics } = extractTopics(domain ? [domain] : []);
 
   return {
     platform: 'hackerrank',
@@ -396,6 +398,8 @@ export function extractHackerRankSubmission(): SubmissionPayload | null {
     language,
     code,
     url: window.location.href,
+    primaryTopic,
+    topics,
     submittedAt: new Date().toISOString(),
     source,
     problemId: slug || undefined

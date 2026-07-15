@@ -11,6 +11,8 @@ import { syncSubmissionToGitHub } from './services/sync';
 import { showNotification } from './services/notifications';
 import { authenticateWithGitHub, cancelDeviceAuthorization } from './github/oauth';
 import { clearGitHubAuth, getGitHubBranches, getGitHubProfile, getGitHubRepositories } from './github/api';
+import { addHistoryItem } from './services/history';
+import { addToOfflineQueue, getOfflineQueue, incrementRetryCount, removeFromOfflineQueue } from './services/queue';
 
 async function saveSyncDebugState(nextState: SyncDebugState): Promise<void> {
   await saveState(STORAGE_KEYS.SYNC_DEBUG, nextState);
@@ -105,6 +107,16 @@ chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
           language: submission.language,
           message: result.message
         });
+        await addHistoryItem({
+          platform: submission.platform,
+          title: submission.title,
+          language: submission.language,
+          repository: settings.repository,
+          branch: settings.branch || 'main',
+          status: result.status === 'duplicate' ? 'duplicate' : 'success',
+          retryCount: 0,
+          url: result.url
+        });
         await showNotification(`✓ ${submission.title} synced successfully.`);
         sendResponse({ ok: true, result });
       } catch (error) {
@@ -120,7 +132,20 @@ chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
           language: submission.language,
           message: messageText
         });
-        await showNotification('Unable to sync.\nRetry');
+        
+        await addToOfflineQueue(submission, messageText);
+        await addHistoryItem({
+          platform: submission.platform,
+          title: submission.title,
+          language: submission.language,
+          repository: settings.repository || '',
+          branch: settings.branch || 'main',
+          status: 'failed',
+          retryCount: 0,
+          message: messageText
+        });
+        
+        await showNotification('Unable to sync. Added to offline queue.');
         sendResponse({ ok: false, reason: messageText });
       }
       return;
@@ -178,3 +203,79 @@ chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
 chrome.runtime.onInstalled.addListener(() => {
   void saveState(STORAGE_KEYS.SETTINGS, DEFAULT_SETTINGS);
 });
+
+// Process offline queue
+async function processOfflineQueue() {
+  const queue = await getOfflineQueue();
+  if (queue.length === 0) return;
+
+  const settings = await loadState<SyncSettings>(STORAGE_KEYS.SETTINGS, DEFAULT_SETTINGS);
+  if (!settings.repository) return;
+  if (!navigator.onLine) return; // Still offline
+
+  for (const item of queue) {
+    if (item.retryCount >= 3) {
+      await removeFromOfflineQueue(item.id);
+      continue;
+    }
+
+    try {
+      const result = await syncSubmissionToGitHub(item.payload, settings);
+      
+      await addHistoryItem({
+        platform: item.payload.platform,
+        title: item.payload.title,
+        language: item.payload.language,
+        repository: settings.repository,
+        branch: settings.branch || 'main',
+        status: result.status === 'duplicate' ? 'duplicate' : 'success',
+        retryCount: item.retryCount + 1,
+        url: result.url
+      });
+      await showNotification(`✓ ${item.payload.title} synced successfully from queue.`);
+      await removeFromOfflineQueue(item.id);
+    } catch (e) {
+      const errorMsg = e instanceof Error ? e.message : 'Unknown error';
+      await incrementRetryCount(item.id, errorMsg);
+      if (item.retryCount + 1 >= 3) {
+        await removeFromOfflineQueue(item.id);
+        await showNotification(`✗ Failed to sync ${item.payload.title} after 3 retries.`);
+      }
+    }
+  }
+}
+
+// Background startup validation and queue processing
+chrome.runtime.onStartup.addListener(() => {
+  void (async () => {
+    // Attempt to process queue
+    await processOfflineQueue();
+
+    // Validate token silently
+    const auth = await loadState<GitHubAuthState>(STORAGE_KEYS.AUTH, { authenticated: false });
+    if (auth.token) {
+      try {
+        await getGitHubProfile(auth.token);
+      } catch {
+        // Token invalid, clear it
+        await clearGitHubAuth();
+      }
+    }
+  })();
+});
+
+// Listen for network reconnect
+if (typeof self !== 'undefined' && 'addEventListener' in self) {
+  self.addEventListener('online', () => {
+    void processOfflineQueue();
+  });
+}
+
+// Set up periodic alarm to process queue
+chrome.alarms.create('processOfflineQueue', { periodInMinutes: 5 });
+chrome.alarms.onAlarm.addListener((alarm) => {
+  if (alarm.name === 'processOfflineQueue') {
+    void processOfflineQueue();
+  }
+});
+

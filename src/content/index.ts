@@ -53,6 +53,7 @@ let pendingRefresh = false;
 let mutationObserver: MutationObserver | null = null;
 let storageListenerInstalled = false;
 let suppressMutationRefresh = false;
+let isSyncing = false;
 
 function normalizeSettings(settings: SyncSettings): SyncSettings {
   return {
@@ -140,11 +141,13 @@ async function isAlreadySynced(submission: SubmissionPayload): Promise<boolean> 
   }
 }
 
-async function syncCurrentSolution(adapter: PlatformAdapter): Promise<void> {
+async function syncCurrentSolution(adapter: PlatformAdapter, isAutoSync = false): Promise<void> {
   if (!isExtensionContextValid()) {
-    setButtonState('failure');
-    showToast('Extension was reloaded. Refresh this page to sync again.', 'error');
-    resetButtonSoon();
+    if (!isAutoSync) {
+      setButtonState('failure');
+      showToast('Extension was reloaded. Refresh this page to sync again.', 'error');
+      resetButtonSoon();
+    }
     return;
   }
 
@@ -155,20 +158,26 @@ async function syncCurrentSolution(adapter: PlatformAdapter): Promise<void> {
     return;
   }
 
+  if (isSyncing) return;
+  isSyncing = true;
   setButtonState('loading');
 
   try {
     const submission = await adapter.extractSubmission();
     if (!submission) {
-      setButtonState('failure');
-      showToast('Unable to read the submitted code from this page.', 'error');
-      resetButtonSoon();
+      if (!isAutoSync) {
+        setButtonState('failure');
+        showToast('Unable to read the submitted code from this page.', 'error');
+        resetButtonSoon();
+      }
       return;
     }
 
     if (await isAlreadySynced(submission)) {
       setButtonState('duplicate');
-      showToast('Already synced this accepted submission.', 'duplicate');
+      if (!isAutoSync) {
+        showToast('Already synced this accepted submission.', 'duplicate');
+      }
       return;
     }
 
@@ -176,7 +185,9 @@ async function syncCurrentSolution(adapter: PlatformAdapter): Promise<void> {
 
     if (!response?.ok || !response.result) {
       setButtonState('failure');
-      showToast(response?.reason || 'Failed to sync.', 'error');
+      if (!isAutoSync || response?.reason !== 'missing-repository') {
+        showToast(response?.reason || 'Failed to sync.', 'error');
+      }
       resetButtonSoon();
       return;
     }
@@ -194,6 +205,8 @@ async function syncCurrentSolution(adapter: PlatformAdapter): Promise<void> {
     setButtonState('failure');
     showToast('Failed to sync.', 'error');
     resetButtonSoon();
+  } finally {
+    isSyncing = false;
   }
 }
 
@@ -257,10 +270,26 @@ async function refreshButtonVisibility(): Promise<void> {
       setButtonState('idle');
     }
     syncButton.syncTheme();
+    
+    // Check auto sync if accepted
+    if (settings.autoSync && !isSyncing && await activeAdapter.isSubmissionAccepted()) {
+      const submission = await activeAdapter.extractSubmission();
+      if (submission && !(await isAlreadySynced(submission))) {
+        void syncCurrentSolution(activeAdapter, true);
+      }
+    }
     return;
   }
 
   mountButton(adapter!);
+  
+  // Check auto sync on mount too
+  if (settings.autoSync && !isSyncing && await adapter!.isSubmissionAccepted()) {
+    const submission = await adapter!.extractSubmission();
+    if (submission && !(await isAlreadySynced(submission))) {
+      void syncCurrentSolution(adapter!, true);
+    }
+  }
 }
 
 function scheduleRefresh(): void {

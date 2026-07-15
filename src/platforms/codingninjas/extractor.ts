@@ -10,6 +10,7 @@ import {
   looksLikeSolutionCode,
   readMonacoModelValue
 } from '../extraction-utils';
+import { extractTopics } from '../topics';
 
 const CN_LANGUAGE_SELECTORS = [
   '[class*="language-selector"]',
@@ -139,6 +140,14 @@ function extractCodingNinjasDifficulty(): string | undefined {
   return undefined;
 }
 
+function extractTagsFromBody(): string[] {
+  const possibleTags = Array.from(document.querySelectorAll('a, span, div, [class*="tag"]'))
+    .map((node) => node.textContent?.trim() ?? '')
+    .filter((text) => /^(array|string|tree|graph|dynamic programming|greedy|recursion|linked list|stack|queue|binary tree|hash|backtracking|math)$/i.test(text));
+
+  return Array.from(new Set(possibleTags));
+}
+
 export function extractCodingNinjasSubmission(): SubmissionPayload | null {
   const code = extractCodingNinjasCode();
   if (!code) {
@@ -149,6 +158,8 @@ export function extractCodingNinjasSubmission(): SubmissionPayload | null {
   const slug = extractSlugFromPathname(window.location.pathname) || title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
   const language = extractCodingNinjasLanguage();
   const difficulty = extractCodingNinjasDifficulty();
+  const tags = extractTagsFromBody();
+  const { primaryTopic, topics } = extractTopics(tags);
 
   return {
     platform: 'codingninjas',
@@ -158,6 +169,9 @@ export function extractCodingNinjasSubmission(): SubmissionPayload | null {
     code,
     difficulty,
     url: window.location.href,
+    tags: tags.length ? tags : undefined,
+    primaryTopic,
+    topics,
     submittedAt: new Date().toISOString(),
     source: 'codingninjas',
     problemId: slug || undefined

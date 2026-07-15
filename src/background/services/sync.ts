@@ -27,29 +27,70 @@ export async function syncSubmissionToGitHub(payload: SubmissionPayload, setting
   const title = normalizeProblemTitle(payload.title);
   const extension = resolveLanguageExtension(payload.language, payload.code);
   const platformFolder = resolvePlatformFolder(payload.platform);
+  const topicFolder = payload.primaryTopic ? `${payload.primaryTopic}/` : '';
   const fileName = payload.platform === 'leetcode' ? `${problemNumber}. ${title}.${extension}` : `${title}.${extension}`;
-  const filePath = `${platformFolder}/${fileName}`;
+  const filePath = `${platformFolder}/${topicFolder}${fileName}`;
   const existingFile = await getGitHubFile(repo, branch, auth.token, filePath);
 
-  if (existingFile && existingFile.content === payload.code) {
-    return {
-      ok: true,
-      status: 'duplicate',
-      message: `Already synced ${fileName}`,
-      url: `https://github.com/${repo}/blob/${branch}/${toGitHubBlobPath(filePath)}`,
-      filePath
-    };
+  let targetFilePath = filePath;
+  let targetSha = existingFile?.sha;
+
+  if (existingFile) {
+    if (existingFile.content === payload.code) {
+      return {
+        ok: true,
+        status: 'duplicate',
+        message: `Already synced ${fileName}`,
+        url: `https://github.com/${repo}/blob/${branch}/${toGitHubBlobPath(filePath)}`,
+        filePath
+      };
+    }
+
+    if (settings.overwriteBehavior === 'skip') {
+      return {
+        ok: true,
+        status: 'duplicate',
+        message: `Skipped ${fileName} (Already exists)`,
+        url: `https://github.com/${repo}/blob/${branch}/${toGitHubBlobPath(filePath)}`,
+        filePath
+      };
+    }
+
+    if (settings.overwriteBehavior === 'versioned') {
+      let version = 1;
+      let newFilePath = '';
+      let newFileExists = true;
+      while (newFileExists) {
+        newFilePath = `${platformFolder}/${topicFolder}${fileName.replace(`.${extension}`, `_${version}.${extension}`)}`;
+        const checkFile = await getGitHubFile(repo, branch, auth.token, newFilePath);
+        if (!checkFile) {
+          newFileExists = false;
+        } else if (checkFile.content === payload.code) {
+          return {
+            ok: true,
+            status: 'duplicate',
+            message: `Already synced ${fileName.replace(`.${extension}`, `_${version}.${extension}`)}`,
+            url: `https://github.com/${repo}/blob/${branch}/${toGitHubBlobPath(newFilePath)}`,
+            filePath: newFilePath
+          };
+        } else {
+          version++;
+        }
+      }
+      targetFilePath = newFilePath;
+      targetSha = undefined;
+    }
   }
 
-  const commitMessage = buildCommitMessage(payload.platform, title, Boolean(existingFile));
-  await putGitHubFile(repo, branch, auth.token, filePath, payload.code, existingFile?.sha, commitMessage);
+  const commitMessage = buildCommitMessage(payload.platform, title, Boolean(existingFile && targetSha));
+  await putGitHubFile(repo, branch, auth.token, targetFilePath, payload.code, targetSha, commitMessage);
 
   return {
     ok: true,
     status: 'success',
-    message: `Synced ${fileName}`,
-    url: `https://github.com/${repo}/blob/${branch}/${toGitHubBlobPath(filePath)}`,
-    filePath
+    message: `Synced ${targetFilePath.split('/').pop()}`,
+    url: `https://github.com/${repo}/blob/${branch}/${toGitHubBlobPath(targetFilePath)}`,
+    filePath: targetFilePath
   };
 }
 

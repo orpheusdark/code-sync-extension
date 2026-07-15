@@ -5,6 +5,7 @@
  */
 import type { SubmissionPayload } from '../../shared/types';
 import { extractCodeFromDocument, readMonacoModelValue, extractLanguageFromDocument, extractProblemTitleFromDocument, extractSlugFromPathname, extractTextBySelectors } from '../extraction-utils';
+import { extractTopics } from '../topics';
 
 interface LeetCodeSubmissionDetailsResponse {
   data?: {
@@ -211,6 +212,8 @@ export async function extractLeetCodeSubmissionFromGraphQL(): Promise<Submission
       difficulty: question?.difficulty || 'Unknown',
       url: window.location.href,
       tags: (question?.topicTags || []).map((tag) => tag.name || '').filter(Boolean),
+      primaryTopic: extractTopics((question?.topicTags || []).map((tag) => tag.name || '').filter(Boolean)).primaryTopic,
+      topics: extractTopics((question?.topicTags || []).map((tag) => tag.name || '').filter(Boolean)).topics,
       submittedAt: details?.timestamp ? new Date(Number(details.timestamp) * 1000).toISOString() : new Date().toISOString(),
       source: 'leetcode-graphql',
       runtime: details?.runtime || 'N/A',

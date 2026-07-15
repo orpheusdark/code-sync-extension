@@ -33,6 +33,30 @@ export interface SyncSettings {
   offlineQueue?: boolean;
 }
 
+export type SyncStatus = 'success' | 'duplicate' | 'failed' | 'pending';
+
+export interface SyncHistoryItem {
+  id: string;
+  platform: Platform;
+  title: string;
+  language: string;
+  repository: string;
+  branch: string;
+  timestamp: string;
+  status: SyncStatus;
+  retryCount: number;
+  message?: string;
+  url?: string;
+}
+
+export interface OfflineQueueItem {
+  id: string;
+  payload: SubmissionPayload;
+  timestamp: string;
+  retryCount: number;
+  lastError?: string;
+}
+
 export interface SubmissionPayload {
   platform: Platform;
   title: string;
@@ -42,6 +66,8 @@ export interface SubmissionPayload {
   difficulty?: string;
   url: string;
   tags?: string[];
+  primaryTopic?: string;
+  topics?: string[];
   submittedAt?: string;
   source?: string;
   problemId?: string;

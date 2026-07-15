@@ -8,7 +8,7 @@ import type { SyncSettings } from './types';
 export const DEFAULT_SETTINGS: SyncSettings = {
   repository: '',
   branch: 'main',
-  autoSync: true,
+  autoSync: false,
   commitTemplate: 'Solved {title}',
   notifications: true,
   overwriteBehavior: 'skip',
@@ -34,5 +34,8 @@ export const STORAGE_KEYS = {
   LAST_SYNCED_SUBMISSION: 'codesync.lastSyncedSubmission',
   SYNC_STATS: 'codesync.syncStats',
   FLOATING_BUTTON_POSITION: 'codesync.floatingButtonPosition',
-  PENDING_DEVICE_AUTH: 'codesync.pendingDeviceAuth'
+  PENDING_DEVICE_AUTH: 'codesync.pendingDeviceAuth',
+  SYNC_HISTORY: 'codesync.syncHistory',
+  OFFLINE_QUEUE: 'codesync.offlineQueue',
+  SETUP_COMPLETE: 'codesync.setupComplete'
 };

@@ -242,6 +242,8 @@ function buildSyncPanel(): string {
     { name: 'duplicateDetection', label: 'Prevent Duplicates', desc: 'Skip syncing if the same solution was already committed' },
     { name: 'retryFailedSync',  label: 'Retry on Failure',   desc: 'Automatically retry failed sync attempts once' },
     { name: 'offlineQueue',     label: 'Offline Queue',       desc: 'Queue syncs when offline and retry when connected' },
+    { name: 'autoMetadata',     label: 'Generate Metadata',  desc: 'Create a metadata.json file for each solution' },
+    { name: 'autoReadme',       label: 'Generate README',    desc: 'Create a README.md file with the problem description' },
   ];
 
   return `
@@ -297,6 +299,13 @@ function buildContactPanel(): string {
               ${c.label}
             </a>`).join('')}
         </div>
+      </div>
+      <div class="setting-card" style="margin-top: 16px;">
+        <div class="setting-card-title">Support & Issues</div>
+        <div class="setting-card-desc">Having Issues? Report a bug or request a feature on our GitHub repository.</div>
+        <a href="https://github.com/orpheusdark/code-sync-extension/issues/new" target="_blank" rel="noopener noreferrer" class="btn-secondary" style="display: inline-flex; align-items: center; justify-content: center; gap: 8px; margin-top: 12px; width: auto; text-decoration: none; width: 100%;">
+          ${I.github} Report a bug
+        </a>
       </div>
     </div>`;
 }
@@ -579,6 +588,8 @@ async function handleSave(): Promise<void> {
     duplicateDetection: data.get('duplicateDetection') === 'on',
     retryFailedSync: data.get('retryFailedSync') === 'on',
     offlineQueue: data.get('offlineQueue') === 'on',
+    autoMetadata: data.get('autoMetadata') === 'on',
+    autoReadme: data.get('autoReadme') === 'on',
     overwriteBehavior: (data.get('overwriteBehavior') as SyncSettings['overwriteBehavior']) || 'skip',
     enabledPlatforms: PLATFORM_OPTIONS.reduce((acc, p) => ({
       ...acc,

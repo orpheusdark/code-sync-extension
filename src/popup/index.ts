@@ -7,7 +7,7 @@ import { DEFAULT_SETTINGS, STORAGE_KEYS } from '../shared/constants';
 import { APPEARANCE_KEY, applyAppearance, DEFAULT_APPEARANCE, type AppearanceSettings } from '../shared/appearance';
 import { MESSAGE_TYPES } from '../shared/messages';
 import { loadState, saveState } from '../shared/storage';
-import type { GitHubAuthState, GitHubBranch, GitHubRepository, SyncSettings, SyncStats } from '../shared/types';
+import type { GitHubAuthState, GitHubBranch, GitHubRepository, SyncSettings, SyncStats, SyncHistoryItem } from '../shared/types';
 import { setHTML } from '../shared/dom';
 
 const app = document.getElementById('app')!;
@@ -30,8 +30,11 @@ interface PopupState {
   settings: SyncSettings;
   auth: GitHubAuthState;
   syncStats: SyncStats;
+  syncHistory: SyncHistoryItem[];
   showLogoutConfirm: boolean;
   appearance: AppearanceSettings;
+  setupComplete: boolean;
+  setupStep: number;
 }
 
 const state: PopupState = {
@@ -48,9 +51,12 @@ const state: PopupState = {
   loadingBranches: false,
   settings: DEFAULT_SETTINGS,
   auth: { authenticated: false },
-  syncStats: { totalSynced: 0, leetcodeSynced: 0, gfgSynced: 0, hackerrankSynced: 0, repositoriesConnected: [] },
+  syncStats: { totalSynced: 0, leetcodeSynced: 0, gfgSynced: 0, hackerrankSynced: 0, codingninjasSynced: 0, repositoriesConnected: [] },
+  syncHistory: [],
   showLogoutConfirm: false,
   appearance: DEFAULT_APPEARANCE,
+  setupComplete: true, // defaults to true, updated in loadData
+  setupStep: 1,
 };
 
 // ================================================================
@@ -209,12 +215,50 @@ function buildBranchCard(): string {
 }
 
 function buildCommitHistory(): string {
+  if (state.syncHistory.length === 0) {
+    return `
+      <div class="section-label">Sync History</div>
+      <div class="coming-soon" aria-label="No sync history yet">
+        <div class="cs-badge">${I.star} Empty</div>
+        <div class="cs-title">No Syncs Yet</div>
+        <div class="cs-desc">Your synced submissions will appear here.</div>
+      </div>`;
+  }
+
+  const itemsHtml = state.syncHistory.slice(0, 5).map(item => {
+    const time = formatRelativeTime(item.timestamp);
+    const success = item.status === 'success' || item.status === 'duplicate';
+    const statusColor = success ? 'var(--ag)' : 'var(--ar)';
+    const statusIcon = success ? I.check : I.power; // using power for error since I don't have an error icon
+
+    return `
+      <div style="background:var(--sf);border:1px solid var(--bd);border-radius:12px;padding:10px 12px;margin-bottom:8px;display:flex;align-items:center;gap:10px;">
+        <div style="width:28px;height:28px;border-radius:8px;background:var(--accent-soft);color:var(--a1);display:flex;align-items:center;justify-content:center;flex-shrink:0;text-transform:uppercase;font-size:0.65rem;font-weight:700;">
+          ${item.platform.slice(0, 2)}
+        </div>
+        <div style="flex:1;min-width:0;">
+          <div style="font-size:0.85rem;font-weight:600;color:var(--t1);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;" title="${escHtml(item.title)}">
+            ${escHtml(item.title)}
+          </div>
+          <div style="font-size:0.7rem;color:var(--t3);display:flex;align-items:center;gap:6px;">
+            <span>${escHtml(item.language)}</span>
+            <span>&bull;</span>
+            <span>${time}</span>
+          </div>
+        </div>
+        <div style="color:${statusColor};" title="${escHtml(item.status)}">
+          ${statusIcon}
+        </div>
+      </div>
+    `;
+  }).join('');
+
   return `
-    <div class="section-label">Commit History</div>
-    <div class="coming-soon" aria-label="Commit history coming soon">
-      <div class="cs-badge">${I.star} Coming Soon</div>
-      <div class="cs-title">Commit History</div>
-      <div class="cs-desc">Your last 5 synced commits will appear here</div>
+    <div class="section-label" style="display:flex;justify-content:space-between;">
+      <span style="display:flex;align-items:center;gap:8px;">Sync History</span>
+    </div>
+    <div style="margin-top:8px;">
+      ${itemsHtml}
     </div>`;
 }
 
@@ -296,6 +340,11 @@ function buildConnectedHome(): string {
     ${buildCommitHistory()}
     ${buildStatusMessage()}
     ${state.showLogoutConfirm ? buildLogoutConfirm() : ''}
+    <div style="text-align: center; margin-bottom: 8px;">
+      <a href="https://github.com/orpheusdark/code-sync-extension/issues/new" target="_blank" rel="noopener noreferrer" style="font-size: 0.75rem; color: var(--t2); text-decoration: none; display: inline-flex; align-items: center; gap: 4px; transition: color 200ms ease;" onmouseover="this.style.color='var(--a1)'" onmouseout="this.style.color='var(--t2)'">
+        Having Issues? <span style="color: var(--a1); font-weight: 600;">Report a bug</span>
+      </a>
+    </div>
     ${buildNavDock()}`;
 }
 
@@ -313,7 +362,55 @@ function buildDisconnectedHome(): string {
     </div>
     ${buildStatusMessage()}
     ${buildAuthCode()}
+    <div style="text-align: center; margin-top: 10px; margin-bottom: 8px;">
+      <a href="https://github.com/orpheusdark/code-sync-extension/issues/new" target="_blank" rel="noopener noreferrer" style="font-size: 0.75rem; color: var(--t2); text-decoration: none; display: inline-flex; align-items: center; gap: 4px; transition: color 200ms ease;" onmouseover="this.style.color='var(--a1)'" onmouseout="this.style.color='var(--t2)'">
+        Having Issues? <span style="color: var(--a1); font-weight: 600;">Report a bug</span>
+      </a>
+    </div>
     ${buildNavDock()}`;
+}
+
+function buildSetupWizard(): string {
+  if (state.setupStep === 1) {
+    if (state.auth.authenticated && state.auth.token) {
+      setTimeout(() => { state.setupStep = 2; render(); }, 0);
+      return ``;
+    }
+    return `
+      ${buildHeader()}
+      <div style="padding:10px;text-align:center;">
+        <h2 style="font-family:'Pirata One';font-size:1.4rem;color:var(--t1);">Welcome to CodeSync</h2>
+        <p style="font-size:0.85rem;color:var(--t2);margin-bottom:15px;">Step 1: Connect your GitHub account</p>
+        <button class="btn-primary" id="btn-login" style="margin-bottom:10px;">
+          ${I.github} Continue with GitHub
+        </button>
+        ${buildStatusMessage()}
+        ${buildAuthCode()}
+      </div>`;
+  }
+  
+  if (state.setupStep === 2) {
+    return `
+      ${buildHeader()}
+      <div style="padding:10px;text-align:center;">
+        <h2 style="font-family:'Pirata One';font-size:1.4rem;color:var(--t1);">Repository Setup</h2>
+        <p style="font-size:0.85rem;color:var(--t2);margin-bottom:15px;">Step 2: Choose where to sync your code</p>
+        
+        ${state.settings.repository ? `
+          ${buildRepoCard()}
+          ${buildBranchCard()}
+          <button class="btn-primary" id="btn-finish-setup" style="margin-top:15px;">
+            Finish Setup
+          </button>
+        ` : `
+          <button class="btn-primary" id="btn-select-repo" style="margin-bottom:10px;">
+            ${I.repo} Select Repository
+          </button>
+        `}
+      </div>`;
+  }
+
+  return '';
 }
 
 function buildRepoPicker(): string {
@@ -410,7 +507,11 @@ function buildBranchPicker(): string {
 function render(): void {
   let html: string;
 
-  if (state.view === 'repo-picker') {
+  if (!state.setupComplete) {
+    if (state.view === 'repo-picker') html = buildRepoPicker();
+    else if (state.view === 'branch-picker') html = buildBranchPicker();
+    else html = buildSetupWizard();
+  } else if (state.view === 'repo-picker') {
     html = buildRepoPicker();
   } else if (state.view === 'branch-picker') {
     html = buildBranchPicker();
@@ -427,13 +528,51 @@ function render(): void {
   app.classList.add('view-enter');
 
   // Bind events for the current view
-  if (state.view === 'repo-picker') {
+  if (!state.setupComplete && state.view === 'home') {
+    bindSetupWizardEvents();
+  } else if (state.view === 'repo-picker') {
     bindRepoPickerEvents();
   } else if (state.view === 'branch-picker') {
     bindBranchPickerEvents();
   } else {
     bindHomeEvents();
   }
+}
+
+// ================================================================
+// EVENT BINDING — SETUP WIZARD
+// ================================================================
+function bindSetupWizardEvents(): void {
+  document.getElementById('btn-login')?.addEventListener('click', () => {
+    void handleLogin();
+  });
+
+  document.getElementById('btn-copy-device-code')?.addEventListener('click', () => {
+    void copyDeviceCode();
+  });
+
+  document.getElementById('btn-open-device')?.addEventListener('click', () => {
+    const url = state.verificationUriComplete || 'https://github.com/login/device';
+    void chrome.tabs.create({ url });
+  });
+
+  document.getElementById('btn-select-repo')?.addEventListener('click', () => {
+    void openRepoPicker();
+  });
+
+  document.getElementById('btn-edit-repo')?.addEventListener('click', () => {
+    void openRepoPicker();
+  });
+
+  document.getElementById('btn-edit-branch')?.addEventListener('click', () => {
+    void openBranchPicker();
+  });
+
+  document.getElementById('btn-finish-setup')?.addEventListener('click', async () => {
+    state.setupComplete = true;
+    await saveState(STORAGE_KEYS.SETUP_COMPLETE, true);
+    render();
+  });
 }
 
 // ================================================================
@@ -537,7 +676,9 @@ function onKeyDown(e: KeyboardEvent): void {
 // EVENT BINDING — REPO PICKER
 // ================================================================
 function bindRepoPickerEvents(): void {
-  bindCommonNav();
+  if (state.setupComplete) {
+    bindCommonNav();
+  }
 
   document.getElementById('btn-back')?.addEventListener('click', () => {
     state.view = 'home';
@@ -605,7 +746,9 @@ function bindRepoItems(): void {
 // EVENT BINDING — BRANCH PICKER
 // ================================================================
 function bindBranchPickerEvents(): void {
-  bindCommonNav();
+  if (state.setupComplete) {
+    bindCommonNav();
+  }
 
   document.getElementById('btn-back')?.addEventListener('click', () => {
     state.view = 'home';
@@ -804,17 +947,25 @@ async function handleLogout(): Promise<void> {
 }
 
 async function loadData(): Promise<void> {
-  const [rawSettings, auth, syncStats, savedAppearance, pendingAuth] = await Promise.all([
+  const [rawSettings, auth, syncStats, savedAppearance, pendingAuth, syncHistory, setupComplete] = await Promise.all([
     loadState<SyncSettings>(STORAGE_KEYS.SETTINGS, DEFAULT_SETTINGS),
     loadState<GitHubAuthState>(STORAGE_KEYS.AUTH, { authenticated: false }),
-    loadState<SyncStats>(STORAGE_KEYS.SYNC_STATS, { totalSynced: 0, leetcodeSynced: 0, gfgSynced: 0, hackerrankSynced: 0, repositoriesConnected: [] }),
+    loadState<SyncStats>(STORAGE_KEYS.SYNC_STATS, { totalSynced: 0, leetcodeSynced: 0, gfgSynced: 0, hackerrankSynced: 0, codingninjasSynced: 0, repositoriesConnected: [] }),
     loadState<AppearanceSettings>(APPEARANCE_KEY, DEFAULT_APPEARANCE),
     loadState<{ userCode?: string; verificationUriComplete?: string } | null>(STORAGE_KEYS.PENDING_DEVICE_AUTH, null),
+    loadState<SyncHistoryItem[]>(STORAGE_KEYS.SYNC_HISTORY, []),
+    loadState<boolean>(STORAGE_KEYS.SETUP_COMPLETE, false),
   ]);
   state.settings = normalizeSettings(rawSettings);
   state.auth = auth;
   state.syncStats = syncStats;
+  state.syncHistory = syncHistory || [];
   state.appearance = { ...DEFAULT_APPEARANCE, ...savedAppearance };
+  state.setupComplete = setupComplete;
+  
+  if (!state.setupComplete) {
+    state.setupStep = (auth.authenticated && auth.token) ? 2 : 1;
+  }
   applyAppearance(state.appearance);
 
   if (!auth.authenticated && pendingAuth?.userCode) {

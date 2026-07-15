@@ -10,6 +10,7 @@ import {
   extractTextBySelectors,
   looksLikeSolutionCode
 } from '../extraction-utils';
+import { extractTopics } from '../topics';
 
 const GFG_LANGUAGE_SELECTORS = [
   '[data-testid="language-selector"] button',
@@ -66,6 +67,7 @@ export function extractGfgSubmission(): SubmissionPayload | null {
     '[class*="difficulty"]'
   ]) || readDifficultyFromBody();
   const tags = extractTagsFromBody();
+  const { primaryTopic, topics } = extractTopics(tags);
 
   return {
     platform: 'gfg',
@@ -76,6 +78,8 @@ export function extractGfgSubmission(): SubmissionPayload | null {
     difficulty: difficulty || undefined,
     url: window.location.href,
     tags: tags.length ? tags : undefined,
+    primaryTopic,
+    topics,
     submittedAt: new Date().toISOString(),
     source: 'gfg',
     problemId: slug || undefined

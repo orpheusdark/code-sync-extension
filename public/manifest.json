@@ -13,7 +13,7 @@
     }
   },
   "description": "Automatically sync accepted coding platform solutions to GitHub.",
-  "permissions": ["storage", "tabs", "activeTab", "identity"],
+  "permissions": ["storage", "tabs", "activeTab", "identity", "alarms"],
   "host_permissions": [
     "https://leetcode.com/*",
     "https://*.leetcode.com/*",
